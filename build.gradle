@@ -1,132 +1,116 @@
-plugins {
-    id 'fabric-loom' version '1.2-SNAPSHOT'
-    id 'maven-publish'
-}  
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
+    }
+}
+        
+apply plugin: 'net.minecraftforge.gradle'
+// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
 
-archivesBaseName = project.archives_base_name
-version = project.mod_version
-group = project.maven_group
+version = '1.0'
+group = 'com.yourname.modid' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'modid'
 
-repositories {
-    maven { url "https://maven.shedaniel.me/" }
-    maven { url "https://maven.terraformersmc.com/" }
-    maven { url 'https://jitpack.io' }
-    maven { url "https://api.modrinth.com/maven" }
-    maven { url "https://www.cursemaven.com" }
-    maven { url "https://maven.nucleoid.xyz/" }
-    maven { url "https://maven.jamieswhiteshirt.com/libs-release/" }
-    maven { url "https://maven.bai.lol" }
-    maven { url "https://ladysnake.jfrog.io/artifactory/mods" }
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+
+minecraft {
+    // The mappings can be changed at any time, and must be in the following format.
+    // snapshot_YYYYMMDD   Snapshot are built nightly.
+    // stable_#            Stables are built at the discretion of the MCP team.
+    // Use non-default mappings at your own risk. they may not always work.
+    // Simply re-run your setup task after changing the mappings to update your workspace.
+    //mappings channel: 'snapshot', version: '20171003-1.12'
+    mappings channel: 'snapshot', version: '20171003-1.12'
+    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+    
+    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    // Default run configurations.
+    // These can be tweaked, removed, or duplicated as needed.
+    runs {
+        client {
+            workingDirectory project.file('run')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+        }
+
+        server {
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+        }
+    }
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
+    // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
+    // The userdev artifact is a special name and will get all sorts of transformations applied to it.
+    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
 
-    // LibZ
-    modApi ('maven.modrinth:libz:1.0.1+1.20'){
-		exclude(group: "net.fabricmc.fabric-api")
-	}
-    // Cloth
-    modImplementation("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
-        exclude(group: "net.fabricmc.fabric-api")
-    }
-    // ModMenu
-    modCompileOnly modRuntimeOnly("com.terraformersmc:modmenu:${project.mod_menu_version}") {
-        exclude(group: "net.fabricmc.fabric-api")
-    }
-    // Wthit
-    modCompileOnly ("mcp.mobius.waila:wthit-api:fabric-8.0.2")
-	// Jade
-    modCompileOnly ('maven.modrinth:jade:11.0.3'){
-		exclude(group: "net.fabricmc.fabric-api")
-	}
-	// MCDA
-	modCompileOnly ('curse.maven:mcda-426206:3821450') {
-		exclude(group: "net.fabricmc.fabric-api")
-	}
-    // DragonLoot
-	modCompileOnly ('maven.modrinth:dragonloot:1.1.2'){
-		exclude(group: "net.fabricmc.fabric-api")
-	}
-    // Trinkets
-    modCompileOnly("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.0")
-	modCompileOnly("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.0")
-    modCompileOnly ('maven.modrinth:trinkets:3.7.0'){
-		exclude(group: "net.fabricmc.fabric-api")
-	}
-    // REI
-    modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:9.0.472"
-    // EMI
-    modCompileOnly "dev.emi:emi:0.4.0+1.19"
+    // You may put jars on which you depend on in ./libs or you may define them like so..
+    // compile "some.group:artifact:version:classifier"
+    // compile "some.group:artifact:version"
 
-    // Dualwielding
-	modCompileOnly ('com.github.Globox1997:DualWielding:1.19-SNAPSHOT') {
-		exclude(group: "net.fabricmc.fabric-api")
-	}
-    // PlaceHolder
-    modCompileOnly ("eu.pb4:placeholder-api:2.1.1+1.20")
-    // Inmis
-	modCompileOnly ("curse.maven:inmis-369254:3853651") {
-		exclude(group: "net.fabricmc.fabric-api")
-	}
-    // CosmeticArmor
-    modCompileOnly ('maven.modrinth:cosmetic-armor:1.5.0'){
-		exclude(group: "net.fabricmc.fabric-api")
-	}
-    // TreeChop
-    modCompileOnly ('maven.modrinth:treechop:0.14.7'){
-		exclude(group: "net.fabricmc.fabric-api")
-	}
-    // Alloygery
-    modCompileOnly ('maven.modrinth:alloygery:2.5.5+1.19.2'){
-		exclude(group: "net.fabricmc.fabric-api")
-	}
-    // Magna
-    modCompileOnly ('com.github.Draylar:magna:1.8.0-1.19.2') {
-		exclude(group: "net.fabricmc.fabric-api")
-	}
-    // Spell-Engine
-    modCompileOnly ('maven.modrinth:spell-engine:0.9.24+1.19-fabric'){
-		exclude(group: "net.fabricmc.fabric-api")
-	}
+    // Real examples
+    // compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
+    // compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
+
+    // The 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
+    // provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+    // These dependencies get remapped to your current MCP mappings
+    // deobf 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+    // For more info...
+    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
+    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
 }
 
-
-processResources {
-    inputs.property "version", project.version
-
-    filesMatching("fabric.mod.json") {
-		expand "version": project.version, "fabric_version": project.fabric_version, "loader_version": project.loader_version, "minecraft_version": project.minecraft_version, "cloth_config_version": project.cloth_config_version
-	}
-}
-
-tasks.withType(JavaCompile).configureEach {
-    it.options.release = 17
-}
-
-java {
-    withSourcesJar()
-
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
+// Example for how to get properties into the manifest for reading by the runtime..
 jar {
-    from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}" }
+    manifest {
+        attributes([
+            "Specification-Title": "examplemod",
+            "Specification-Vendor": "examplemodsareus",
+            "Specification-Version": "1", // We are version 1 of ourselves
+            "Implementation-Title": project.name,
+            "Implementation-Version": "${version}",
+            "Implementation-Vendor" :"examplemodsareus",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
     }
 }
+
+// Example configuration to allow publishing using the maven-publish task
+// This is the preferred method to reobfuscate your jar file
+jar.finalizedBy('reobfJar') 
+// However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
+//publish.dependsOn('reobfJar')
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            from components.java
+            artifact jar
         }
     }
-
     repositories {
+        maven {
+            url "file:///${project.projectDir}/mcmodsrepo"
+        }
     }
 }
