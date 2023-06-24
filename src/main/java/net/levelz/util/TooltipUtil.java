@@ -6,45 +6,50 @@ import java.util.List;
 import net.levelz.init.ConfigInit;
 import net.levelz.stats.PlayerStatsManager;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 public class TooltipUtil {
 
     // Recommend to play with https://www.curseforge.com/minecraft/mc-mods/health-overlay-fabric
 
-    public static void renderTooltip(MinecraftClient client, DrawContext context) {
+    public static void renderTooltip(Minecraft client, ScaledResolution context) {
         if (client.crosshairTarget != null && ConfigInit.CONFIG.showLockedBlockInfo) {
-            HitResult hitResult = client.crosshairTarget;
+            RayTraceResult hitResult = client.objectMouseOver;
             // Add entity tooltip?
             // if (hitResult.getType() == HitResult.Type.ENTITY) {
             // ((EntityHitResult) hitResult).getEntity();
             // // return ((EntityHitResult) hitResult).getEntity() instanceof NamedScreenHandlerFactory;
             // }
-            if (hitResult.getType() == HitResult.Type.BLOCK) {
-                Block block = client.world.getBlockState(((BlockHitResult) hitResult).getBlockPos()).getBlock();
-                int blockId = Registries.BLOCK.getRawId(block);
+            if (hitResult.typeOfHit.equals(RayTraceResult.Type.BLOCK)) {
+                Block block = client.world.getBlockState((hitResult).getBlockPos()).getBlock();
+                int blockId = 0;
                 if (PlayerStatsManager.listContainsItemOrBlock(client.player, blockId, 1)) {
-                    renderTooltip(client, context, Arrays.asList(Text.of(block.getName().getString()), Text.of("Mineable Lv. " + PlayerStatsManager.getUnlockLevel(blockId, 1))),
-                            Registries.BLOCK.getId(block), context.getScaledWindowWidth() / 2 + ConfigInit.CONFIG.lockedBlockInfoPosX, ConfigInit.CONFIG.lockedBlockInfoPosY);
+                    renderTooltip(client, context, Arrays.asList(new TextComponentString(block.getLocalizedName()), new TextComponentString("Mineable Lv. " + PlayerStatsManager.getUnlockLevel(blockId, 1))),
+                            block, context.getScaledWidth() / 2 + ConfigInit.CONFIG.lockedBlockInfoPosX, ConfigInit.CONFIG.lockedBlockInfoPosY);
                 }
             }
         }
     }
 
-    private static void renderTooltip(MinecraftClient client, DrawContext context, List<Text> text, Identifier identifier, int x, int y) {
-        int textWidth = client.textRenderer.getWidth(text.get(0)) > client.textRenderer.getWidth(text.get(1)) ? client.textRenderer.getWidth(text.get(0)) : client.textRenderer.getWidth(text.get(1));
+    private static void renderTooltip(Minecraft client, ScaledResolution context, List<TextComponentString> text, ResourceLocation identifier, int x, int y) {
+        int textWidth = client.fontRenderer.getStringWidth(text.get(0).getText()) > client.fontRenderer.getStringWidth(text.get(1).getText()) ?
+                client.fontRenderer.getStringWidth(text.get(0).getText()) : client.fontRenderer.getStringWidth(text.get(1).getText());
         int l = x - textWidth / 2 - 3;
         int m = y + 4;
         int k = textWidth + 23;
         int n = 17;
-
-        context.getMatrices().push();
 
         int colorStart = 0xBF191919; // background
         int colorTwo = 0xBF7F0200; // light border
@@ -52,13 +57,10 @@ public class TooltipUtil {
 
         render(context, l, m, k, n, 400, colorStart, colorTwo, colorThree);
 
-        context.getMatrices().translate(0.0, 0.0, 400.0);
+        context.drawText(client.fontRenderer, text.get(0), x - k / 2 + 30, y + 4, 0xFFFFFF, false);
+        context.drawText(client.fontRenderer, text.get(1), x - k / 2 + 30, y + 14, 0xFFFFFF, false);
 
-        context.drawText(client.textRenderer, text.get(0), x - k / 2 + 30, y + 4, 0xFFFFFF, false);
-        context.drawText(client.textRenderer, text.get(1), x - k / 2 + 30, y + 14, 0xFFFFFF, false);
-
-        context.drawItem(Registries.ITEM.get(identifier).getDefaultStack(), x - k / 2 + 11, y + 5);
-        context.getMatrices().pop();
+        context.drawItem(ForgeRegistries.ITEMS.getValue(identifier).getDefaultInstance(), x - k / 2 + 11, y + 5);
     }
 
     public static void render(DrawContext context, int x, int y, int width, int height, int z, int background, int borderColorStart, int borderColorEnd) {

@@ -8,7 +8,7 @@ import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.levelz.access.PlayerSyncAccess;
 import net.levelz.data.LevelLists;
-import net.levelz.mixin.entity.EntityAccessor;
+import net.levelz.network.mixin.entity.EntityAccessor;
 import net.levelz.stats.PlayerStatsManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;

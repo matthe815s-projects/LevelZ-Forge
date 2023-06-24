@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,11 +31,6 @@ public class LevelLoader implements SimpleSynchronousResourceReloadListener {
     private List<Boolean> replaceList = new ArrayList<Boolean>();
     // List for crafting recipe
     private List<String> skillList = new ArrayList<String>();
-
-    @Override
-    public Identifier getFabricId() {
-        return new Identifier("levelz", "level_loader");
-    }
 
     @Override
     public void reload(ResourceManager manager) {
@@ -388,19 +384,19 @@ public class LevelLoader implements SimpleSynchronousResourceReloadListener {
                     // + new Identifier(data.getAsJsonArray("block").get(i).getAsString().replace("#", "")) + " : " + BlockTags.ACACIA_LOGS.toString());
                     LOGGER.info("{} might be a block tag but tags are not supported (yet?)", data.getAsJsonArray("block").get(i).getAsString());
                     continue;
-                } else if (Registries.BLOCK.get(new Identifier(data.getAsJsonArray("block").get(i).getAsString())).toString().equals("Block{minecraft:air}")) {
+                } else if (ForgeRegistries.BLOCKS.getValue(new Identifier(data.getAsJsonArray("block").get(i).getAsString())).toString().equals("Block{minecraft:air}")) {
                     LOGGER.info("{} is not a valid block identifier", data.getAsJsonArray("block").get(i).getAsString());
                     continue;
                 }
-                idList.add(Registries.BLOCK.getRawId(Registries.BLOCK.get(new Identifier(data.getAsJsonArray("block").get(i).getAsString()))));
+                idList.add(ForgeRegistries.BLOCKS.getValue(Registries.BLOCK.get(new Identifier(data.getAsJsonArray("block").get(i).getAsString()))));
             }
         } else if (type == 2 || type == 3) {
             for (int i = 0; i < data.getAsJsonArray("item").size(); i++) {
-                if (Registries.ITEM.get(new Identifier(data.getAsJsonArray("item").get(i).getAsString())).toString().equals("air")) {
+                if (ForgeRegistries.ITEMS.get(new Identifier(data.getAsJsonArray("item").get(i).getAsString())).toString().equals("air")) {
                     LOGGER.info("{} is not a valid item identifier", data.getAsJsonArray("item").get(i).getAsString());
                     continue;
                 }
-                idList.add(Registries.ITEM.getRawId(Registries.ITEM.get(new Identifier(data.getAsJsonArray("item").get(i).getAsString()))));
+                idList.add(ForgeRegistries.ITEMS.getRawId(Registries.ITEM.get(new Identifier(data.getAsJsonArray("item").get(i).getAsString()))));
             }
         }
 

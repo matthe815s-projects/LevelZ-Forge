@@ -9,18 +9,7 @@ import net.levelz.init.ConfigInit;
 import net.levelz.init.EntityInit;
 import net.levelz.network.PlayerStatsServerPacket;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.MovementType;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.util.TypeFilter;
-import net.minecraft.util.math.Box;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -37,7 +26,6 @@ public class LevelExperienceOrbEntity extends Entity {
     private Map<Integer, Integer> clumpedMap;
 
     public LevelExperienceOrbEntity(World world, double x, double y, double z, int amount) {
-        this((EntityType<? extends LevelExperienceOrbEntity>) EntityInit.LEVEL_EXPERIENCE_ORB, world);
         this.setPosition(x, y, z);
         this.setYaw((float) (this.random.nextDouble() * 360.0));
         this.setVelocity((this.random.nextDouble() * (double) 0.2f - (double) 0.1f) * 2.0, this.random.nextDouble() * 0.2 * 2.0, (this.random.nextDouble() * (double) 0.2f - (double) 0.1f) * 2.0);
@@ -310,6 +298,21 @@ public class LevelExperienceOrbEntity extends Entity {
     @Override
     public Packet<ClientPlayPacketListener> createSpawnPacket() {
         return new PlayerStatsServerPacket().createS2CLevelExperienceOrbPacket(this);
+    }
+
+    @Override
+    protected void entityInit() {
+
+    }
+
+    @Override
+    protected void readEntityFromNBT(NBTTagCompound compound) {
+
+    }
+
+    @Override
+    protected void writeEntityToNBT(NBTTagCompound compound) {
+
     }
 
     @Override

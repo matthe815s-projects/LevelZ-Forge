@@ -3,6 +3,7 @@ package net.levelz.init;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import net.minecraft.client.settings.KeyBinding;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.api.EnvType;
@@ -21,10 +22,10 @@ public class KeyInit {
 
     public static void init() {
         // Keybinds
-        screenKey = new KeyBinding("key.levelz.openskillscreen", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_K, "category.levelz.keybind");
-        devKey = new KeyBinding("key.levelz.dev", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_F8, "category.levelz.keybind");
+        screenKey = new KeyBinding("key.levelz.openskillscreen", 51, "category.levelz.keybind");
+        devKey = new KeyBinding("key.levelz.dev", 52,  "category.levelz.keybind");
         // Registering
-        KeyBindingHelper.registerKeyBinding(screenKey);
+        KeyBinding.registerKeyBinding(screenKey);
         // Callback
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (screenKey.wasPressed()) {

@@ -1,26 +1,16 @@
 package net.levelz.entity.render;
 
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
-
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.levelz.entity.LevelExperienceOrbEntity;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
 
-@Environment(EnvType.CLIENT)
+@SideOnly(Side.CLIENT)
 public class LevelExperienceOrbEntityRenderer extends EntityRenderer<LevelExperienceOrbEntity> {
-    private static final Identifier TEXTURE = new Identifier("textures/entity/experience_orb.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation("textures/entity/experience_orb.png");
     private static final RenderLayer LAYER = RenderLayer.getItemEntityTranslucentCull(TEXTURE);
 
     public LevelExperienceOrbEntityRenderer(EntityRendererFactory.Context context) {

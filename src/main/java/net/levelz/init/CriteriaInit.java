@@ -3,7 +3,7 @@ package net.levelz.init;
 import net.fabricmc.fabric.mixin.object.builder.CriteriaAccessor;
 import net.levelz.criteria.LevelZCriterion;
 import net.levelz.criteria.SkillCriterion;
-import net.levelz.mixin.misc.ScoreboardCriterionAccessor;
+import net.levelz.network.mixin.misc.ScoreboardCriterionAccessor;
 import net.minecraft.scoreboard.ScoreboardCriterion;
 
 public class CriteriaInit {
