@@ -1,43 +1,59 @@
 package net.levelz.criteria;
 
+import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 
-import net.minecraft.advancement.criterion.AbstractCriterion;
-import net.minecraft.advancement.criterion.AbstractCriterionConditions;
-import net.minecraft.predicate.entity.AdvancementEntityPredicateDeserializer;
-import net.minecraft.predicate.entity.AdvancementEntityPredicateSerializer;
-import net.minecraft.predicate.entity.LootContextPredicate;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
+import net.minecraft.advancements.ICriterionTrigger;
+import net.minecraft.advancements.PlayerAdvancements;
+import net.minecraft.advancements.critereon.AbstractCriterionInstance;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.storage.loot.LootContext;
 
-public class LevelZCriterion extends AbstractCriterion<LevelZCriterion.Conditions> {
-    private static final Identifier ID = new Identifier("levelz:level");
+public class LevelZCriterion implements ICriterionTrigger<LevelZCriterion.Conditions> {
+    private static final ResourceLocation ID = new ResourceLocation("levelz:level");
 
     @Override
-    public Identifier getId() {
+    public ResourceLocation getId() {
         return ID;
     }
 
     @Override
-    protected Conditions conditionsFromJson(JsonObject jsonObject, LootContextPredicate lootContextPredicate, AdvancementEntityPredicateDeserializer advancementEntityPredicateDeserializer) {
-        NumberPredicate numberPredicate = NumberPredicate.fromJson(jsonObject.get("level"));
-        return new Conditions(lootContextPredicate, numberPredicate);
+    public void addListener(PlayerAdvancements playerAdvancementsIn, Listener<Conditions> listener) {
+
     }
 
-    public void trigger(ServerPlayerEntity player, int level) {
+    @Override
+    public void removeListener(PlayerAdvancements playerAdvancementsIn, Listener<Conditions> listener) {
+
+    }
+
+    @Override
+    public void removeAllListeners(PlayerAdvancements playerAdvancementsIn) {
+
+    }
+
+    @Override
+    public Conditions deserializeInstance(JsonObject json, JsonDeserializationContext context) {
+        NumberPredicate numberPredicate = NumberPredicate.fromJson(json.get("level"));
+        return new Conditions(numberPredicate);
+    }
+
+    public void trigger(EntityPlayerMP player, int level) {
         this.trigger(player, conditions -> conditions.matches(player, level));
     }
 
-    class Conditions extends AbstractCriterionConditions {
+    class Conditions extends AbstractCriterionInstance {
 
         private final NumberPredicate numberPredicate;
 
-        public Conditions(LootContextPredicate lootContextPredicate, NumberPredicate numberPredicate) {
-            super(ID, lootContextPredicate);
+        public Conditions(NumberPredicate numberPredicate) {
+            super(LevelZCriterion.ID);
             this.numberPredicate = numberPredicate;
         }
 
-        public boolean matches(ServerPlayerEntity player, int level) {
+        public boolean matches(EntityPlayerMP player, int level) {
             return this.numberPredicate.test(level);
         }
 

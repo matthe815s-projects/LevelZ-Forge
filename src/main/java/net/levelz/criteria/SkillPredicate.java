@@ -3,7 +3,7 @@ package net.levelz.criteria;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.minecraft.util.JsonHelper;
+import net.minecraft.util.JsonUtils;
 
 public class SkillPredicate {
     private final String jobName;
@@ -20,7 +20,7 @@ public class SkillPredicate {
     }
 
     public static SkillPredicate fromJson(JsonElement json) {
-        String jobName = JsonHelper.asString(json, "skill_name");
+        String jobName = JsonUtils.getString(json, "skill_name");
         return new SkillPredicate(jobName);
     }
 

@@ -2,7 +2,7 @@ package net.levelz.criteria;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.util.JsonHelper;
+import net.minecraft.util.JsonUtils;
 
 public class NumberPredicate {
     private final int levelZ;
@@ -19,7 +19,7 @@ public class NumberPredicate {
     }
 
     public static NumberPredicate fromJson(JsonElement json) {
-        int level = JsonHelper.asInt(json, "level");
+        int level = JsonUtils.getInt(json, "level");
         return new NumberPredicate(level);
     }
 

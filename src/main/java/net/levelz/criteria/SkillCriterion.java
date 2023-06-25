@@ -1,54 +1,64 @@
 package net.levelz.criteria;
 
+import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 
-import net.minecraft.advancement.criterion.AbstractCriterion;
-import net.minecraft.advancement.criterion.AbstractCriterionConditions;
-import net.minecraft.predicate.entity.AdvancementEntityPredicateDeserializer;
-import net.minecraft.predicate.entity.AdvancementEntityPredicateSerializer;
-import net.minecraft.predicate.entity.LootContextPredicate;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
+import net.minecraft.advancements.ICriterionTrigger;
+import net.minecraft.advancements.PlayerAdvancements;
+import net.minecraft.advancements.critereon.AbstractCriterionInstance;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.ResourceLocation;
 
-public class SkillCriterion extends AbstractCriterion<SkillCriterion.Conditions> {
-    static final Identifier ID = new Identifier("levelz:skill");
+public class SkillCriterion implements ICriterionTrigger<SkillCriterion.Conditions> {
+    static final ResourceLocation ID = new ResourceLocation("levelz:skill");
+
+    public SkillCriterion(ResourceLocation criterionIn) {
+        super();
+    }
 
     @Override
-    public Identifier getId() {
+    public ResourceLocation getId() {
         return ID;
     }
 
     @Override
-    protected Conditions conditionsFromJson(JsonObject jsonObject, LootContextPredicate lootContextPredicate, AdvancementEntityPredicateDeserializer advancementEntityPredicateDeserializer) {
-        SkillPredicate skillPredicate = SkillPredicate.fromJson(jsonObject.get("skill_name"));
-        NumberPredicate skillLevelPredicate = NumberPredicate.fromJson(jsonObject.get("skill_level"));
-        return new Conditions(lootContextPredicate, skillPredicate, skillLevelPredicate);
+    public void addListener(PlayerAdvancements playerAdvancementsIn, Listener<Conditions> listener) {
+
     }
 
-    public void trigger(ServerPlayerEntity player, String skillName, int skillLevel) {
+    @Override
+    public void removeListener(PlayerAdvancements playerAdvancementsIn, Listener<Conditions> listener) {
+
+    }
+
+    @Override
+    public void removeAllListeners(PlayerAdvancements playerAdvancementsIn) {
+
+    }
+
+    @Override
+    public Conditions deserializeInstance(JsonObject json, JsonDeserializationContext context) {
+        SkillPredicate skillPredicate = SkillPredicate.fromJson(json.get("skill_name"));
+        NumberPredicate skillLevelPredicate = NumberPredicate.fromJson(json.get("skill_level"));
+        return new Conditions(skillPredicate, skillLevelPredicate);
+    }
+
+    public void trigger(EntityPlayerMP player, String skillName, int skillLevel) {
         this.trigger(player, conditions -> conditions.matches(player, skillName, skillLevel));
     }
 
-    class Conditions extends AbstractCriterionConditions {
+    class Conditions extends AbstractCriterionInstance {
         private final SkillPredicate skillPredicate;
         private final NumberPredicate skillLevelPredicate;
 
-        public Conditions(LootContextPredicate lootContextPredicate, SkillPredicate skillPredicate, NumberPredicate skillLevelPredicate) {
-            super(ID, lootContextPredicate);
+        public Conditions(SkillPredicate skillPredicate, NumberPredicate skillLevelPredicate) {
+            super(SkillCriterion.ID);
             this.skillPredicate = skillPredicate;
             this.skillLevelPredicate = skillLevelPredicate;
         }
 
-        public boolean matches(ServerPlayerEntity player, String skillName, int skillLevel) {
+        public boolean matches(EntityPlayerMP player, String skillName, int skillLevel) {
             return this.skillPredicate.test(skillName) && skillLevelPredicate.test(skillLevel);
-        }
-
-        @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
-            JsonObject jsonObject = super.toJson(predicateSerializer);
-            jsonObject.add("skill_name", this.skillPredicate.toJson());
-            jsonObject.add("skill_level", this.skillLevelPredicate.toJson());
-            return jsonObject;
         }
     }
 
