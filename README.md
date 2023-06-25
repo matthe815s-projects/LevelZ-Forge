@@ -1,12 +1,9 @@
-# LevelZ
+# LevelZ - Forge
+
+This is a Forge rewrite of the popular Level-Z, originally on Fabric.
 
 LevelZ is a mod which adds skillables to the player which can get skilled to unlock blocks and strengthen passive
 skills.
-
-### Installation
-
-LevelZ is a mod built for the [Fabric Loader](https://fabricmc.net/). It
-requires [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api), [Cloth Config API](https://www.curseforge.com/minecraft/mc-mods/cloth-config) and [LibZ](https://www.curseforge.com/minecraft/mc-mods/libz) to be installed separately; all other dependencies are installed with the mod.
 
 ### License
 
