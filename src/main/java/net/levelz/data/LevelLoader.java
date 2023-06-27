@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import net.minecraft.client.resources.IResourcePack;
+import net.minecraft.client.resources.SimpleReloadableResourceManager;
+import net.minecraft.client.resources.data.MetadataSerializer;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,15 +16,9 @@ import org.apache.logging.log4j.Logger;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.levelz.init.ConfigInit;
-import net.libz.util.SortList;
-import net.minecraft.registry.Registries;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
 
-public class LevelLoader implements SimpleSynchronousResourceReloadListener {
+public class LevelLoader extends SimpleReloadableResourceManager {
     private static final Logger LOGGER = LogManager.getLogger("LevelZ");
 
     // List of lists which get filled and cleared while loading data
@@ -31,6 +28,15 @@ public class LevelLoader implements SimpleSynchronousResourceReloadListener {
     private List<Boolean> replaceList = new ArrayList<Boolean>();
     // List for crafting recipe
     private List<String> skillList = new ArrayList<String>();
+
+    @Override
+    public void reloadResourcePack(IResourcePack resourcePack) {
+        super.reloadResourcePack(resourcePack);
+    }
+
+    public LevelLoader(MetadataSerializer rmMetadataSerializerIn) {
+        super(rmMetadataSerializerIn);
+    }
 
     @Override
     public void reload(ResourceManager manager) {
