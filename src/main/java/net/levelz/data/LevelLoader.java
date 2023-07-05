@@ -1,5 +1,6 @@
 package net.levelz.data;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 import net.minecraft.client.resources.IResourcePack;
 import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.client.resources.data.MetadataSerializer;
+import net.minecraft.util.JsonUtils;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,18 +40,17 @@ public class LevelLoader extends SimpleReloadableResourceManager {
         super(rmMetadataSerializerIn);
     }
 
-    @Override
     public void reload(ResourceManager manager) {
         clearEveryList();
         // Mining
         if (ConfigInit.CONFIG.miningProgression) {
-            manager.findResources("mining", id -> id.getPath().endsWith(".json")).forEach((id, resourceRef) -> {
+            manager.findResources("mining", id -> id.getResourcePath().endsWith(".json")).forEach((id, resourceRef) -> {
                 try {
-                    InputStream stream = resourceRef.getInputStream();
-                    JsonObject data = JsonParser.parseReader(new InputStreamReader(stream)).getAsJsonObject();
+                    InputStream stream = new FileInputStream(resourceRef);
+                    JsonObject data = new JsonParser().parse(new InputStreamReader(stream)).getAsJsonObject();
                     if (levelList.contains(data.get("level").getAsInt())) {
                         int index = levelList.indexOf(data.get("level").getAsInt());
-                        if (JsonHelper.getBoolean(data, "replace", false)) {
+                        if (JsonUtils.getBoolean(data, "replace", false)) {
                             levelList.remove(index);
                             objectList.remove(index);
                             replaceList.remove(index);

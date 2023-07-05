@@ -1,5 +1,7 @@
 package net.levelz.data;
 
+import net.minecraft.util.ResourceLocation;
+
 public interface ResourcePredicate {
-    void Something(String id);
+    boolean Loop(ResourceLocation id);
 }
