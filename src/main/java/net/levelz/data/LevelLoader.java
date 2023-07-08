@@ -11,6 +11,7 @@ import net.minecraft.client.resources.IResourcePack;
 import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.client.resources.data.MetadataSerializer;
 import net.minecraft.util.JsonUtils;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -72,16 +73,16 @@ public class LevelLoader extends SimpleReloadableResourceManager {
 
         // Item
         if (ConfigInit.CONFIG.itemProgression) {
-            manager.findResources("item", id -> id.getPath().endsWith(".json")).forEach((id, resourceRef) -> {
+            manager.findResources("item", id -> id.getResourcePath().endsWith(".json")).forEach((id, resourceRef) -> {
                 try {
-                    InputStream stream = resourceRef.getInputStream();
-                    JsonObject data = JsonParser.parseReader(new InputStreamReader(stream)).getAsJsonObject();
+                    InputStream stream = new FileInputStream(resourceRef);
+                    JsonObject data = new JsonParser().parse(new InputStreamReader(stream)).getAsJsonObject();
                     ArrayList<Object> list = LevelLists.getList(data.get("item").getAsString());
 
                     if (data.get("item").getAsString().equals("minecraft:armor") || data.get("item").getAsString().equals("minecraft:tool") || data.get("item").getAsString().equals("minecraft:hoe")
                             || data.get("item").getAsString().equals("minecraft:sword") || data.get("item").getAsString().equals("minecraft:axe")) {
                         if (list.contains(data.get("material").getAsString())) {
-                            if (JsonHelper.getBoolean(data, "replace", false)) {
+                            if (JsonUtils.getBoolean(data, "replace", false)) {
                                 int removeLines = list.indexOf(data.get("material").getAsString());
                                 for (int i = 0; i < 5; i++) {
                                     list.remove(removeLines);
@@ -97,11 +98,11 @@ public class LevelLoader extends SimpleReloadableResourceManager {
                         list.add(data.get("skill").getAsString());
                         list.add(data.get("level").getAsInt());
                         list.add(data.get("item").getAsString());
-                        list.add(JsonHelper.getBoolean(data, "replace", false));
+                        list.add(JsonUtils.getBoolean(data, "replace", false));
                     } else if (data.get("item").getAsString().equals("minecraft:custom_item")) {
                         ArrayList<Object> customList = LevelLists.getList(data.get("item").getAsString());
                         if (customList.contains(data.get("object").getAsString())) {
-                            if (JsonHelper.getBoolean(data, "replace", false)) {
+                            if (JsonUtils.getBoolean(data, "replace", false)) {
                                 int removeLines = list.indexOf(data.get("object").getAsString());
                                 for (int i = 0; i < 5; i++) {
                                     list.remove(removeLines);
@@ -113,7 +114,7 @@ public class LevelLoader extends SimpleReloadableResourceManager {
                                 return;
                             }
                         }
-                        if (Registries.ITEM.get(new Identifier(data.get("object").getAsString())).toString().equals("air") && JsonHelper.getBoolean(data, "required", true)) {
+                        if (ForgeRegistries.ITEMS.getValue(new ResourceLocation(data.get("object").getAsString())).toString().equals("air") && JsonUtils.getBoolean(data, "required", true)) {
                             LOGGER.info("Resource {} was not loaded cause {} is not a valid item identifier", id.toString(), data.get("object").getAsString());
                             return;
                         }
@@ -121,10 +122,10 @@ public class LevelLoader extends SimpleReloadableResourceManager {
                         customList.add(data.get("skill").getAsString());
                         customList.add(data.get("level").getAsInt());
                         customList.add(data.get("item").getAsString());
-                        customList.add(JsonHelper.getBoolean(data, "replace", false));
+                        customList.add(JsonUtils.getBoolean(data, "replace", false));
                     } else {
                         if (!list.isEmpty()) {
-                            if (JsonHelper.getBoolean(data, "replace", false)) {
+                            if (JsonUtils.getBoolean(data, "replace", false)) {
                                 list.clear();
                             } else {
                                 if (!(boolean) list.get(3)) {
@@ -133,14 +134,14 @@ public class LevelLoader extends SimpleReloadableResourceManager {
                                 return;
                             }
                         }
-                        if (Registries.ITEM.get(new Identifier(data.get("item").getAsString())).toString().equals("air") && JsonHelper.getBoolean(data, "required", true)) {
+                        if (ForgeRegistries.ITEMS.getValue(new ResourceLocation(data.get("item").getAsString())).toString().equals("air") && JsonUtils.getBoolean(data, "required", true)) {
                             LOGGER.info("Resource {} was not loaded cause {} is not a valid item identifier", id.toString(), data.get("item").getAsString());
                             return;
                         }
                         list.add(data.get("skill").getAsString());
                         list.add(data.get("level").getAsInt());
                         list.add(data.get("item").getAsString());
-                        list.add(JsonHelper.getBoolean(data, "replace", false));
+                        list.add(JsonUtils.getBoolean(data, "replace", false));
                     }
                 } catch (Exception e) {
                     LOGGER.error("Error occurred while loading resource {}. {}", id.toString(), e.toString());
@@ -150,16 +151,16 @@ public class LevelLoader extends SimpleReloadableResourceManager {
 
         // Block
         if (ConfigInit.CONFIG.blockProgression) {
-            manager.findResources("block", id -> id.getPath().endsWith(".json")).forEach((id, resourceRef) -> {
+            manager.findResources("block", id -> id.getResourcePath().endsWith(".json")).forEach((id, resourceRef) -> {
                 try {
-                    InputStream stream = resourceRef.getInputStream();
-                    JsonObject data = JsonParser.parseReader(new InputStreamReader(stream)).getAsJsonObject();
+                    InputStream stream = new FileInputStream(resourceRef);
+                    JsonObject data = new JsonParser().parse(new InputStreamReader(stream)).getAsJsonObject();
                     ArrayList<Object> list = LevelLists.getList(data.get("block").getAsString());
 
                     if (data.get("block").getAsString().equals("minecraft:custom_block")) {
                         ArrayList<Object> customList = LevelLists.getList(data.get("block").getAsString());
                         if (customList.contains(data.get("object").getAsString())) {
-                            if (JsonHelper.getBoolean(data, "replace", false)) {
+                            if (JsonUtils.getBoolean(data, "replace", false)) {
                                 int removeLines = list.indexOf(data.get("object").getAsString());
                                 for (int i = 0; i < 5; i++) {
                                     list.remove(removeLines);
@@ -171,7 +172,7 @@ public class LevelLoader extends SimpleReloadableResourceManager {
                                 return;
                             }
                         }
-                        if (Registries.BLOCK.get(new Identifier(data.get("object").getAsString())).toString().equals("Block{minecraft:air}")) {
+                        if (ForgeRegistries.BLOCKS.getValue(new ResourceLocation(data.get("object").getAsString())).toString().equals("Block{minecraft:air}")) {
                             LOGGER.info("Resource {} was not loaded cause {} is not a valid block identifier", id.toString(), data.get("object").getAsString());
                             return;
                         }
@@ -179,10 +180,10 @@ public class LevelLoader extends SimpleReloadableResourceManager {
                         customList.add(data.get("skill").getAsString());
                         customList.add(data.get("level").getAsInt());
                         customList.add(data.get("block").getAsString());
-                        customList.add(JsonHelper.getBoolean(data, "replace", false));
+                        customList.add(JsonUtils.getBoolean(data, "replace", false));
                     } else {
                         if (!list.isEmpty()) {
-                            if (JsonHelper.getBoolean(data, "replace", false)) {
+                            if (JsonUtils.getBoolean(data, "replace", false)) {
                                 list.clear();
                             } else {
                                 if (!(boolean) list.get(3)) {
@@ -191,14 +192,14 @@ public class LevelLoader extends SimpleReloadableResourceManager {
                                 return;
                             }
                         }
-                        if (Registries.BLOCK.get(new Identifier(data.get("block").getAsString())).toString().equals("Block{minecraft:air}")) {
+                        if (ForgeRegistries.BLOCKS.getValue(new ResourceLocation(data.get("block").getAsString())).toString().equals("Block{minecraft:air}")) {
                             LOGGER.info("Resource {} was not loaded cause {} is not a valid block identifier", id.toString(), data.get("block").getAsString());
                             return;
                         }
                         list.add(data.get("skill").getAsString());
                         list.add(data.get("level").getAsInt());
                         list.add(data.get("block").getAsString());
-                        list.add(JsonHelper.getBoolean(data, "replace", false));
+                        list.add(JsonUtils.getBoolean(data, "replace", false));
                         // EnchantingTable
                         if (data.get("enchanting_tier") != null) {
                             for (int i = 0; i < data.getAsJsonArray("enchanting_tier").size(); i++) {
@@ -214,16 +215,16 @@ public class LevelLoader extends SimpleReloadableResourceManager {
 
         // Entity
         if (ConfigInit.CONFIG.entityProgression) {
-            manager.findResources("entity", id -> id.getPath().endsWith(".json")).forEach((id, resourceRef) -> {
+            manager.findResources("entity", id -> id.getResourcePath().endsWith(".json")).forEach((id, resourceRef) -> {
                 try {
-                    InputStream stream = resourceRef.getInputStream();
-                    JsonObject data = JsonParser.parseReader(new InputStreamReader(stream)).getAsJsonObject();
+                    InputStream stream = new FileInputStream(resourceRef);
+                    JsonObject data = new JsonParser().parse(new InputStreamReader(stream)).getAsJsonObject();
                     ArrayList<Object> list = LevelLists.getList(data.get("entity").getAsString());
 
                     if (data.get("entity").getAsString().equals("minecraft:custom_entity")) {
                         ArrayList<Object> customList = LevelLists.getList(data.get("entity").getAsString());
                         if (customList.contains(data.get("object").getAsString())) {
-                            if (JsonHelper.getBoolean(data, "replace", false)) {
+                            if (JsonUtils.getBoolean(data, "replace", false)) {
                                 int removeLines = list.indexOf(data.get("object").getAsString());
                                 for (int i = 0; i < 5; i++) {
                                     list.remove(removeLines);
@@ -235,7 +236,7 @@ public class LevelLoader extends SimpleReloadableResourceManager {
                                 return;
                             }
                         }
-                        if (Registries.ENTITY_TYPE.get(new Identifier(data.get("object").getAsString())).toString().equals("entity.minecraft.pig")) {
+                        if (ForgeRegistries.ENTITIES.getValue(new ResourceLocation(data.get("object").getAsString())).toString().equals("entity.minecraft.pig")) {
                             LOGGER.info("Resource {} was not loaded cause {} is not a valid entity identifier", id.toString(), data.get("object").getAsString());
                             return;
                         }
@@ -243,10 +244,10 @@ public class LevelLoader extends SimpleReloadableResourceManager {
                         customList.add(data.get("skill").getAsString());
                         customList.add(data.get("level").getAsInt());
                         customList.add(data.get("entity").getAsString());
-                        customList.add(JsonHelper.getBoolean(data, "replace", false));
+                        customList.add(JsonUtils.getBoolean(data, "replace", false));
                     } else {
                         if (!list.isEmpty()) {
-                            if (JsonHelper.getBoolean(data, "replace", false)) {
+                            if (JsonUtils.getBoolean(data, "replace", false)) {
                                 list.clear();
                             } else {
                                 if (!(boolean) list.get(3)) {
@@ -256,14 +257,14 @@ public class LevelLoader extends SimpleReloadableResourceManager {
                             }
                         }
                         if (!data.get("entity").getAsString().equals("minecraft:breeding")
-                                && Registries.ENTITY_TYPE.get(new Identifier(data.get("entity").getAsString())).toString().equals("entity.minecraft.pig")) {
+                                && ForgeRegistries.ENTITIES.getValue(new ResourceLocation(data.get("entity").getAsString())).toString().equals("entity.minecraft.pig")) {
                             LOGGER.info("Resource {} was not loaded cause {} is not a valid entity identifier", id.toString(), data.get("entity").getAsString());
                             return;
                         }
                         list.add(data.get("skill").getAsString());
                         list.add(data.get("level").getAsInt());
                         list.add(data.get("entity").getAsString());
-                        list.add(JsonHelper.getBoolean(data, "replace", false));
+                        list.add(JsonUtils.getBoolean(data, "replace", false));
                     }
                 } catch (Exception e) {
                     LOGGER.error("Error occurred while loading resource {}. {}", id.toString(), e.toString());
@@ -273,14 +274,14 @@ public class LevelLoader extends SimpleReloadableResourceManager {
 
         // Brewing
         if (ConfigInit.CONFIG.brewingProgression) {
-            manager.findResources("brewing", id -> id.getPath().endsWith(".json")).forEach((id, resourceRef) -> {
+            manager.findResources("brewing", id -> id.getResourcePath().endsWith(".json")).forEach((id, resourceRef) -> {
                 try {
-                    InputStream stream = resourceRef.getInputStream();
-                    JsonObject data = JsonParser.parseReader(new InputStreamReader(stream)).getAsJsonObject();
+                    InputStream stream = new FileInputStream(resourceRef);
+                    JsonObject data = new JsonParser().parse(new InputStreamReader(stream)).getAsJsonObject();
 
                     if (levelList.contains(data.get("level").getAsInt())) {
                         int index = levelList.indexOf(data.get("level").getAsInt());
-                        if (JsonHelper.getBoolean(data, "replace", false)) {
+                        if (JsonUtils.getBoolean(data, "replace", false)) {
                             levelList.remove(index);
                             objectList.remove(index);
                             replaceList.remove(index);
@@ -301,14 +302,14 @@ public class LevelLoader extends SimpleReloadableResourceManager {
 
         // Smithing
         if (ConfigInit.CONFIG.smithingProgression) {
-            manager.findResources("smithing", id -> id.getPath().endsWith(".json")).forEach((id, resourceRef) -> {
+            manager.findResources("smithing", id -> id.getResourcePath().endsWith(".json")).forEach((id, resourceRef) -> {
                 try {
-                    InputStream stream = resourceRef.getInputStream();
-                    JsonObject data = JsonParser.parseReader(new InputStreamReader(stream)).getAsJsonObject();
+                    InputStream stream = new FileInputStream(resourceRef);
+                    JsonObject data = new JsonParser().parse(new InputStreamReader(stream)).getAsJsonObject();
 
                     if (levelList.contains(data.get("level").getAsInt())) {
                         int index = levelList.indexOf(data.get("level").getAsInt());
-                        if (JsonHelper.getBoolean(data, "replace", false)) {
+                        if (JsonUtils.getBoolean(data, "replace", false)) {
                             levelList.remove(index);
                             objectList.remove(index);
                             replaceList.remove(index);
@@ -329,10 +330,10 @@ public class LevelLoader extends SimpleReloadableResourceManager {
         }
 
         // Crafting
-        manager.findResources("crafting", id -> id.getPath().endsWith(".json")).forEach((id, resourceRef) -> {
+        manager.findResources("crafting", id -> id.getResourcePath().endsWith(".json")).forEach((id, resourceRef) -> {
             try {
-                InputStream stream = resourceRef.getInputStream();
-                JsonObject data = JsonParser.parseReader(new InputStreamReader(stream)).getAsJsonObject();
+                InputStream stream = new FileInputStream(resourceRef);
+                JsonObject data = new JsonParser().parse(new InputStreamReader(stream)).getAsJsonObject();
 
                 int index = -1;
                 if (skillList.contains(data.get("skill").getAsString()))
@@ -343,7 +344,7 @@ public class LevelLoader extends SimpleReloadableResourceManager {
                         }
 
                 if (index != -1) {
-                    if (JsonHelper.getBoolean(data, "replace", false)) {
+                    if (JsonUtils.getBoolean(data, "replace", false)) {
                         skillList.remove(index);
                         levelList.remove(index);
                         objectList.remove(index);
@@ -391,19 +392,19 @@ public class LevelLoader extends SimpleReloadableResourceManager {
                     // + new Identifier(data.getAsJsonArray("block").get(i).getAsString().replace("#", "")) + " : " + BlockTags.ACACIA_LOGS.toString());
                     LOGGER.info("{} might be a block tag but tags are not supported (yet?)", data.getAsJsonArray("block").get(i).getAsString());
                     continue;
-                } else if (ForgeRegistries.BLOCKS.getValue(new Identifier(data.getAsJsonArray("block").get(i).getAsString())).toString().equals("Block{minecraft:air}")) {
+                } else if (ForgeRegistries.BLOCKS.getValue(new ResourceLocation(data.getAsJsonArray("block").get(i).getAsString())).toString().equals("Block{minecraft:air}")) {
                     LOGGER.info("{} is not a valid block identifier", data.getAsJsonArray("block").get(i).getAsString());
                     continue;
                 }
-                idList.add(ForgeRegistries.BLOCKS.getValue(Registries.BLOCK.get(new Identifier(data.getAsJsonArray("block").get(i).getAsString()))));
+                // idList.add(ForgeRegistries.BLOCKS.getValue(ForgeRegistries.BLOCKS.get(new ResourceLocation(data.getAsJsonArray("block").get(i).getAsString()))));
             }
         } else if (type == 2 || type == 3) {
             for (int i = 0; i < data.getAsJsonArray("item").size(); i++) {
-                if (ForgeRegistries.ITEMS.get(new Identifier(data.getAsJsonArray("item").get(i).getAsString())).toString().equals("air")) {
+                if (ForgeRegistries.ITEMS.getValue(new ResourceLocation(data.getAsJsonArray("item").get(i).getAsString())).toString().equals("air")) {
                     LOGGER.info("{} is not a valid item identifier", data.getAsJsonArray("item").get(i).getAsString());
                     continue;
                 }
-                idList.add(ForgeRegistries.ITEMS.getRawId(Registries.ITEM.get(new Identifier(data.getAsJsonArray("item").get(i).getAsString()))));
+                // idList.add(ForgeRegistries.ITEMS.getKey(ForgeRegistries.ITEMS.getValue(new ResourceLocation(data.getAsJsonArray("item").get(i).getAsString()))));
             }
         }
 
@@ -417,7 +418,7 @@ public class LevelLoader extends SimpleReloadableResourceManager {
                 skillList.add(data.get("skill").getAsString());
             levelList.add(data.get("level").getAsInt());
             objectList.add(idList);
-            replaceList.add(JsonHelper.getBoolean(data, "replace", false));
+            replaceList.add(JsonUtils.getBoolean(data, "replace", false));
         }
     }
 
@@ -449,7 +450,7 @@ public class LevelLoader extends SimpleReloadableResourceManager {
                 LevelLists.craftingLevelList.addAll(levelList);
                 LevelLists.craftingSkillList.addAll(skillList);
                 LevelLists.craftingItemList.addAll(objectList);
-                SortList.concurrentSort(LevelLists.craftingLevelList, LevelLists.craftingLevelList, LevelLists.craftingSkillList, LevelLists.craftingItemList);
+                // SortList.concurrentSort(LevelLists.craftingLevelList, LevelLists.craftingLevelList, LevelLists.craftingSkillList, LevelLists.craftingItemList);
                 this.skillList.clear();
             }
             this.objectList.clear();
