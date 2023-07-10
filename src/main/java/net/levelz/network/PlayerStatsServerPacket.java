@@ -19,23 +19,23 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.ResourceLocation;
 
 public class PlayerStatsServerPacket {
 
-    public static final Identifier STATS_INCREASE_PACKET = new Identifier("levelz", "player_increase_stats");
-    public static final Identifier STATS_SYNC_PACKET = new Identifier("levelz", "player_sync_stats");
-    public static final Identifier XP_PACKET = new Identifier("levelz", "player_level_xp");
-    public static final Identifier LEVEL_PACKET = new Identifier("levelz", "player_level_stats");
-    public static final Identifier LIST_PACKET = new Identifier("levelz", "unlocking_list");
-    public static final Identifier STRENGTH_PACKET = new Identifier("levelz", "strength_sync");
-    public static final Identifier RESET_PACKET = new Identifier("levelz", "reset_skill");
-    public static final Identifier LEVEL_EXPERIENCE_ORB_PACKET = new Identifier("levelz", "level_experience_orb");
-    public static final Identifier SEND_CONFIG_SYNC_PACKET = new Identifier("levelz", "send_config_sync_packet");
-    public static final Identifier CONFIG_SYNC_PACKET = new Identifier("levelz", "config_sync_packet");
-    public static final Identifier TAG_PACKET = new Identifier("levelz", "tag_packet");
-    public static final Identifier SEND_TAG_PACKET = new Identifier("levelz", "send_tag_packet");
-    public static final Identifier LEVEL_UP_BUTTON_PACKET = new Identifier("levelz", "level_up_button");
+    public static final ResourceLocation STATS_INCREASE_PACKET = new ResourceLocation("levelz", "player_increase_stats");
+    public static final ResourceLocation STATS_SYNC_PACKET = new ResourceLocation("levelz", "player_sync_stats");
+    public static final ResourceLocation XP_PACKET = new ResourceLocation("levelz", "player_level_xp");
+    public static final ResourceLocation LEVEL_PACKET = new ResourceLocation("levelz", "player_level_stats");
+    public static final ResourceLocation LIST_PACKET = new ResourceLocation("levelz", "unlocking_list");
+    public static final ResourceLocation STRENGTH_PACKET = new ResourceLocation("levelz", "strength_sync");
+    public static final ResourceLocation RESET_PACKET = new ResourceLocation("levelz", "reset_skill");
+    public static final ResourceLocation LEVEL_EXPERIENCE_ORB_PACKET = new ResourceLocation("levelz", "level_experience_orb");
+    public static final ResourceLocation SEND_CONFIG_SYNC_PACKET = new ResourceLocation("levelz", "send_config_sync_packet");
+    public static final ResourceLocation CONFIG_SYNC_PACKET = new ResourceLocation("levelz", "config_sync_packet");
+    public static final ResourceLocation TAG_PACKET = new ResourceLocation("levelz", "tag_packet");
+    public static final ResourceLocation SEND_TAG_PACKET = new ResourceLocation("levelz", "send_tag_packet");
+    public static final ResourceLocation LEVEL_UP_BUTTON_PACKET = new ResourceLocation("levelz", "level_up_button");
 
     public static void init() {
         ServerPlayNetworking.registerGlobalReceiver(STATS_INCREASE_PACKET, (server, player, handler, buffer, sender) -> {
@@ -86,7 +86,7 @@ public class PlayerStatsServerPacket {
             writeS2CConfigSyncPacket(player, ConfigInit.CONFIG.getConfigList());
         });
         ServerPlayNetworking.registerGlobalReceiver(SEND_TAG_PACKET, (server, player, handler, buffer, sender) -> {
-            writeS2CTagPacket(player, buffer.readIdentifier());
+            writeS2CTagPacket(player, buffer.readResourceLocation());
         });
         ServerPlayNetworking.registerGlobalReceiver(LEVEL_UP_BUTTON_PACKET, (server, player, handler, buffer, sender) -> {
             int levelUp = buffer.readInt();
@@ -205,11 +205,11 @@ public class PlayerStatsServerPacket {
         serverPlayerEntity.networkHandler.sendPacket(packet);
     }
 
-    public static void writeS2CTagPacket(ServerPlayerEntity serverPlayerEntity, Identifier identifier) {
+    public static void writeS2CTagPacket(ServerPlayerEntity serverPlayerEntity, ResourceLocation ResourceLocation) {
         // PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         // System.out.println(Blocks.ACACIA_LOG.getRegistryEntry().isIn(BlockTags.ACACIA_LOGS));
         // System.out.println(Registry.BLOCK.getOrCreateEntryList(BlockTags.ACACIA_LOGS));
-        // System.out.println(Registry.BLOCK.getOrCreateEntryList(TagKey.of(Registry.BLOCK_KEY, identifier)));
+        // System.out.println(Registry.BLOCK.getOrCreateEntryList(TagKey.of(Registry.BLOCK_KEY, ResourceLocation)));
     }
 
     public static void writeS2CListPacket(ServerPlayerEntity serverPlayerEntity) {

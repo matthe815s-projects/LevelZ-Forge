@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
 @SideOnly(Side.CLIENT)
-public class LevelExperienceOrbEntityRenderer extends EntityRenderer<LevelExperienceOrbEntity> {
+public class LevelExperienceOrbEntityRenderer extends EntityRenderer {
     private static final ResourceLocation TEXTURE = new ResourceLocation("textures/entity/experience_orb.png");
     private static final RenderLayer LAYER = RenderLayer.getItemEntityTranslucentCull(TEXTURE);
 

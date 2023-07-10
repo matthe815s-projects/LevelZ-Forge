@@ -9,6 +9,7 @@ import net.levelz.init.ConfigInit;
 import net.levelz.init.EntityInit;
 import net.levelz.network.PlayerStatsServerPacket;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -22,30 +23,20 @@ public class LevelExperienceOrbEntity extends Entity {
     private int health = 5;
     private int amount;
     private int pickingCount = 1;
-    private PlayerEntity target;
+    private EntityPlayer target;
     private Map<Integer, Integer> clumpedMap;
 
-    public LevelExperienceOrbEntity(World world, double x, double y, double z, int amount) {
-        this.setPosition(x, y, z);
-        this.setYaw((float) (this.random.nextDouble() * 360.0));
-        this.setVelocity((this.random.nextDouble() * (double) 0.2f - (double) 0.1f) * 2.0, this.random.nextDouble() * 0.2 * 2.0, (this.random.nextDouble() * (double) 0.2f - (double) 0.1f) * 2.0);
-        this.amount = amount;
+    public LevelExperienceOrbEntity(World world) {
+        super(world);
     }
 
-    public LevelExperienceOrbEntity(EntityType<? extends LevelExperienceOrbEntity> entityType, World world) {
-        super(entityType, world);
-    }
-
-    @Override
     protected Entity.MoveEffect getMoveEffect() {
         return Entity.MoveEffect.NONE;
     }
 
-    @Override
     protected void initDataTracker() {
     }
 
-    @Override
     public void tick() {
         Vec3d vec3d;
         double d;
