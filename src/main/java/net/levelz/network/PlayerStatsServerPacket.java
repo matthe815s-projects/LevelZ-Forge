@@ -5,12 +5,17 @@ import java.util.List;
 
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.levelz.LevelzClient;
 import net.levelz.access.PlayerStatsManagerAccess;
 import net.levelz.access.PlayerSyncAccess;
 import net.levelz.data.LevelLists;
 import net.levelz.entity.LevelExperienceOrbEntity;
 import net.levelz.init.ConfigInit;
 import net.levelz.init.CriteriaInit;
+import net.levelz.network.packets.PacketLevelUpButton;
+import net.levelz.network.packets.PacketServerConfigSync;
+import net.levelz.network.packets.PacketServerSendTag;
+import net.levelz.network.packets.PacketServerStatsIncrease;
 import net.levelz.stats.PlayerStatsManager;
 import net.levelz.stats.Skill;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -20,6 +25,7 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class PlayerStatsServerPacket {
 
@@ -38,62 +44,10 @@ public class PlayerStatsServerPacket {
     public static final ResourceLocation LEVEL_UP_BUTTON_PACKET = new ResourceLocation("levelz", "level_up_button");
 
     public static void init() {
-        ServerPlayNetworking.registerGlobalReceiver(STATS_INCREASE_PACKET, (server, player, handler, buffer, sender) -> {
-            String skillString = buffer.readString().toUpperCase();
-            int level = buffer.readInt();
-            server.execute(() -> {
-                PlayerStatsManager playerStatsManager = ((PlayerStatsManagerAccess) player).getPlayerStatsManager();
-                if (playerStatsManager.getSkillPoints() - level >= 0) {
-                    Skill skill = Skill.valueOf(skillString);
-                    if (!ConfigInit.CONFIG.allowHigherSkillLevel && playerStatsManager.getSkillLevel(skill) >= ConfigInit.CONFIG.maxLevel) {
-                        return;
-                    }
-
-                    for (int i = 1; i <= level; i++) {
-                        CriteriaInit.SKILL_UP.trigger(player, skillString.toLowerCase(), playerStatsManager.getSkillLevel(skill) + level);
-                    }
-                    playerStatsManager.setSkillLevel(skill, playerStatsManager.getSkillLevel(skill) + level);
-                    playerStatsManager.setSkillPoints(playerStatsManager.getSkillPoints() - level);
-                    switch (skill) {
-                    case HEALTH -> {
-                        player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)
-                                .setBaseValue(player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH) + ConfigInit.CONFIG.healthBonus * level);
-                        player.setHealth(player.getHealth() + (float) ConfigInit.CONFIG.healthBonus * level);
-                    }
-                    case STRENGTH -> player.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE)
-                            .setBaseValue(player.getAttributeBaseValue(EntityAttributes.GENERIC_ATTACK_DAMAGE) + ConfigInit.CONFIG.attackBonus * level);
-                    case AGILITY -> player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)
-                            .setBaseValue(player.getAttributeBaseValue(EntityAttributes.GENERIC_MOVEMENT_SPEED) + ConfigInit.CONFIG.movementBonus * level);
-                    case DEFENSE -> player.getAttributeInstance(EntityAttributes.GENERIC_ARMOR)
-                            .setBaseValue(player.getAttributeBaseValue(EntityAttributes.GENERIC_ARMOR) + ConfigInit.CONFIG.defenseBonus * level);
-                    case LUCK -> player.getAttributeInstance(EntityAttributes.GENERIC_LUCK)
-                            .setBaseValue(player.getAttributeBaseValue(EntityAttributes.GENERIC_LUCK) + ConfigInit.CONFIG.luckBonus * level);
-                    case MINING -> syncLockedBlockList(playerStatsManager);
-                    case ALCHEMY -> syncLockedBrewingItemList(playerStatsManager);
-                    case SMITHING -> syncLockedSmithingItemList(playerStatsManager);
-                    default -> {
-                    }
-                    }
-                    syncLockedCraftingItemList(playerStatsManager);
-
-                    writeS2CSyncLevelPacket(playerStatsManager, player, skill);
-                }
-
-            });
-        });
-
-        ServerPlayNetworking.registerGlobalReceiver(SEND_CONFIG_SYNC_PACKET, (server, player, handler, buffer, sender) -> {
-            writeS2CConfigSyncPacket(player, ConfigInit.CONFIG.getConfigList());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(SEND_TAG_PACKET, (server, player, handler, buffer, sender) -> {
-            writeS2CTagPacket(player, buffer.readResourceLocation());
-        });
-        ServerPlayNetworking.registerGlobalReceiver(LEVEL_UP_BUTTON_PACKET, (server, player, handler, buffer, sender) -> {
-            int levelUp = buffer.readInt();
-            server.execute(() -> {
-                ((PlayerSyncAccess) player).levelUp(levelUp, true, false);
-            });
-        });
+        LevelzClient.NETWORK.registerMessage(PacketServerStatsIncrease.class, PacketServerStatsIncrease.class, 0, Side.SERVER);
+        LevelzClient.NETWORK.registerMessage(PacketServerConfigSync.class, PacketServerConfigSync.class, 1, Side.SERVER);
+        LevelzClient.NETWORK.registerMessage(PacketServerSendTag.class, PacketServerSendTag.class, 2, Side.SERVER);
+        LevelzClient.NETWORK.registerMessage(PacketLevelUpButton.class, PacketLevelUpButton.class, 3, Side.SERVER);
     }
 
     public static void writeS2CSyncLevelPacket(PlayerStatsManager playerStatsManager, ServerPlayerEntity serverPlayerEntity, Skill skill) {
