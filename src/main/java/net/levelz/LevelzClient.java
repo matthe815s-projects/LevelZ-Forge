@@ -20,17 +20,11 @@ public class LevelzClient {
         KeyInit.init();
         PlayerStatsClientPacket.init();
         RenderInit.init();
-
-        CommandInit.init();
-        CompatInit.init();
-        ConfigInit.init();
         CriteriaInit.init();
         EntityInit.init();
-        EventInit.init();
         JsonReaderInit.init();
         PlayerStatsServerPacket.init();
         TagInit.init();
-        ItemInit.init();
     }
 
 }
