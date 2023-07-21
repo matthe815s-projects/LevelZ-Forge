@@ -13,6 +13,8 @@ import net.levelz.init.ConfigInit;
 import net.levelz.network.packets.*;
 import net.levelz.stats.PlayerStatsManager;
 import net.levelz.stats.Skill;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class PlayerStatsClientPacket {
@@ -65,18 +67,18 @@ public class PlayerStatsClientPacket {
 //        MinecraftClient.getInstance().getNetworkHandler().sendPacket(packet);
     }
 
-//    public static void writeC2SSyncConfigPacket() {
+    public static void writeC2SSyncConfigPacket() {
 //        MinecraftClient.getInstance().getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(PlayerStatsServerPacket.SEND_CONFIG_SYNC_PACKET, new PacketByteBuf(Unpooled.buffer())));
     }
 
-    // public static void writeC2STagPacket(List<Object> list) {
+    public static void writeC2STagPacket(List<Object> list) {
     // PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
     // CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(PlayerStatsServerPacket.SEND_TAG_PACKET, buf);
     // MinecraftClient.getInstance().getNetworkHandler().sendPacket(packet);
-    // }
+    }
 
     // Private executes
-    private static void executeXPPacket(PlayerEntity player, PacketByteBuf buf) {
+    private static void executeXPPacket(EntityPlayer player, PacketBuffer buf) {
 //        PlayerStatsManager playerStatsManager = ((PlayerStatsManagerAccess) player).getPlayerStatsManager();
 //        playerStatsManager.setLevelProgress(buf.readFloat());
 //        playerStatsManager.setTotalLevelExperience(buf.readInt());
@@ -84,7 +86,7 @@ public class PlayerStatsClientPacket {
         // playerStatsManager.setLevel("level", buf.readInt());
     }
 
-    private static void executeLevelPacket(PlayerEntity player, PacketByteBuf buf) {
+    private static void executeLevelPacket(EntityPlayer player, PacketBuffer buf) {
 //        PlayerStatsManager playerStatsManager = ((PlayerStatsManagerAccess) player).getPlayerStatsManager();
 //        playerStatsManager.setLevelProgress(buf.readFloat());
 //        playerStatsManager.setTotalLevelExperience(buf.readInt());
@@ -100,7 +102,7 @@ public class PlayerStatsClientPacket {
 //        PlayerStatsServerPacket.syncLockedCraftingItemList(playerStatsManager);
     }
 
-    private static void executeListPacket(PacketByteBuf buf, ClientPlayerEntity player) {
+    private static void executeListPacket(PacketBuffer buf, EntityPlayer player) {
         LevelLoader.clearEveryList();
         ArrayList<String> list = new ArrayList<>();
 //        while (buf.isReadable()) {

@@ -41,7 +41,7 @@ public class LevelZCriterion implements ICriterionTrigger<LevelZCriterion.Condit
     }
 
     public void trigger(EntityPlayerMP player, int level) {
-        this.trigger(player, conditions -> conditions.matches(player, level));
+        this.trigger(player, 0);
     }
 
     class Conditions extends AbstractCriterionInstance {
@@ -55,13 +55,6 @@ public class LevelZCriterion implements ICriterionTrigger<LevelZCriterion.Condit
 
         public boolean matches(EntityPlayerMP player, int level) {
             return this.numberPredicate.test(level);
-        }
-
-        @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
-            JsonObject jsonObject = super.toJson(predicateSerializer);
-            jsonObject.add("level", this.numberPredicate.toJson());
-            return jsonObject;
         }
     }
 

@@ -44,7 +44,7 @@ public class SkillCriterion implements ICriterionTrigger<SkillCriterion.Conditio
     }
 
     public void trigger(EntityPlayerMP player, String skillName, int skillLevel) {
-        this.trigger(player, conditions -> conditions.matches(player, skillName, skillLevel));
+        this.trigger(player, skillName, skillLevel);
     }
 
     class Conditions extends AbstractCriterionInstance {

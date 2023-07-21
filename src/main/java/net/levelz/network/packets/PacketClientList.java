@@ -19,13 +19,13 @@ public class PacketClientList implements IMessage, IMessageHandler<PacketClientL
 
     @Override
     public IMessage onMessage(PacketClientList message, MessageContext ctx) {
-        PacketByteBuf newBuffer = new PacketByteBuf(Unpooled.buffer());
-        while (buf.isReadable()) {
-            newBuffer.writeString(buf.readString());
-        }
-        client.execute(() -> {
-            executeListPacket(newBuffer, client.player);
-        });
+//        PacketByteBuf newBuffer = new PacketByteBuf(Unpooled.buffer());
+//        while (buf.isReadable()) {
+//            newBuffer.writeString(buf.readString());
+//        }
+//        client.execute(() -> {
+//            executeListPacket(newBuffer, client.player);
+//        });
         return null;
     }
 }

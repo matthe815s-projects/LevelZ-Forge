@@ -11,6 +11,9 @@ public class PacketServerSyncLevel implements IMessage, IMessageHandler<PacketSe
     int level = 0;
     int skillPoints = 0;
 
+    public PacketServerSyncLevel() {
+    }
+
     public PacketServerSyncLevel (String skill, int level, int skillPoints) {
         this.skill = skill;
         this.level = level;

@@ -4,9 +4,10 @@ import net.levelz.access.PlayerStatsManagerAccess;
 import net.levelz.data.LevelLists;
 import net.levelz.init.ConfigInit;
 import net.levelz.network.PlayerStatsServerPacket;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 public class PlayerStatsManager {
 
-    private final PlayerEntity playerEntity;
+    private final EntityPlayer playerEntity;
 
     // Level
     public int overallLevel;
@@ -25,11 +26,11 @@ public class PlayerStatsManager {
     // Skill
     private final Map<Skill, Integer> skillLevel = new HashMap<>();
 
-    public PlayerStatsManager(PlayerEntity playerEntity) {
+    public PlayerStatsManager(EntityPlayer playerEntity) {
         this.playerEntity = playerEntity;
     }
 
-    public PlayerEntity getPlayerEntity() {
+    public EntityPlayer getPlayerEntity() {
         return playerEntity;
     }
 
@@ -41,28 +42,28 @@ public class PlayerStatsManager {
 
     // Wood, Stone, Iron, Gold, Diamond, Netherite
 
-    public void readNbt(NbtCompound tag) {
-        if (tag.contains("SkillPoints", 99)) {
+    public void readNbt(NBTTagCompound tag) {
+        if (tag.hasKey("SkillPoints", 99)) {
             // Level
-            this.overallLevel = tag.getInt("Level");
+            this.overallLevel = tag.getInteger("Level");
             this.levelProgress = tag.getFloat("LevelProgress");
-            this.totalLevelExperience = tag.getInt("TotalLevelExperience");
-            this.skillPoints = tag.getInt("SkillPoints");
+            this.totalLevelExperience = tag.getInteger("TotalLevelExperience");
+            this.skillPoints = tag.getInteger("SkillPoints");
             // Skill
             for (Skill stats : Skill.values()) {
-                skillLevel.put(stats, tag.getInt(stats.getNbt()));
+                skillLevel.put(stats, tag.getInteger(stats.getNbt()));
             }
         }
     }
 
-    public void writeNbt(NbtCompound tag) {
+    public void writeNbt(NBTTagCompound tag) {
         // Level
-        tag.putInt("Level", this.overallLevel);
-        tag.putFloat("LevelProgress", this.levelProgress);
-        tag.putInt("TotalLevelExperience", this.totalLevelExperience);
-        tag.putInt("SkillPoints", this.skillPoints);
+        tag.setInteger("Level", this.overallLevel);
+        tag.setFloat("LevelProgress", this.levelProgress);
+        tag.setInteger("TotalLevelExperience", this.totalLevelExperience);
+        tag.setInteger("SkillPoints", this.skillPoints);
         // Skill
-        skillLevel.forEach((k, v) -> tag.putInt(k.getNbt(), v));
+        skillLevel.forEach((k, v) -> tag.setInteger(k.getNbt(), v));
 
     }
 
@@ -115,19 +116,28 @@ public class PlayerStatsManager {
     @Deprecated
     public void setLevel(String string, int level) {
         switch (string) {
-            case "level" -> this.overallLevel = level;
-            case "points" -> this.skillPoints = level;
-            default -> setSkillLevel(Skill.valueOf(string.toUpperCase()), level);
+            case "level":
+                this.overallLevel = level;
+                break;
+            case "points":
+                this.skillPoints = level;
+                break;
+            default:
+                setSkillLevel(Skill.valueOf(string.toUpperCase()), level);
+                break;
         }
     }
 
     @Deprecated
     public int getLevel(String string) {
-        return switch (string) {
-            case "level" -> this.overallLevel;
-            case "points" -> this.skillPoints;
-            default -> getSkillLevel(Skill.valueOf(string.toUpperCase()));
-        };
+        switch (string) {
+            case "level":
+                return this.overallLevel;
+            case "points":
+                return this.skillPoints;
+            default:
+                return getSkillLevel(Skill.valueOf(string.toUpperCase()));
+        }
     }
 
     public void addExperienceLevels(int levels) {
@@ -169,7 +179,7 @@ public class PlayerStatsManager {
 
     public long getNonIndependentExperience() {
         int level = playerEntity.experienceLevel;
-        float experienceProgress = playerEntity.experienceProgress;
+        float experienceProgress = playerEntity.experience;
         if (level == lastExperienceLevel && experienceProgress == lastExperienceProgress) {
             return lastExperience;
         }
@@ -181,14 +191,14 @@ public class PlayerStatsManager {
                 exp += i >= 15 ? 37 + (i - 15) * 5 : 7 + i * 2;
             }
         }
-        exp += playerEntity.getNextLevelExperience() * experienceProgress;
+        exp += 100 * experienceProgress;
         lastExperienceLevel = level;
         lastExperienceProgress = experienceProgress;
         lastExperience = exp;
         return exp;
     }
 
-    public static boolean playerLevelisHighEnough(PlayerEntity playerEntity, List<Object> list, String string, boolean creativeRequired) {
+    public static boolean playerLevelisHighEnough(EntityPlayer playerEntity, List<Object> list, String string, boolean creativeRequired) {
         if (!playerEntity.isCreative() || !creativeRequired) {
             PlayerStatsManager playerStatsManager = ((PlayerStatsManagerAccess) playerEntity).getPlayerStatsManager();
             int playerLevel = 0;
@@ -216,7 +226,7 @@ public class PlayerStatsManager {
     }
 
     // 1 = mining, 2 = alchemy, 3 = smithing, 4 = crafting
-    public static boolean listContainsItemOrBlock(PlayerEntity playerEntity, int id, int reference) {
+    public static boolean listContainsItemOrBlock(EntityPlayer playerEntity, int id, int reference) {
         PlayerStatsManager playerStatsManager = ((PlayerStatsManagerAccess) playerEntity).getPlayerStatsManager();
         if (reference == 1) {
             if (playerStatsManager.getSkillLevel(Skill.MINING) < ConfigInit.CONFIG.maxLevel && playerStatsManager.lockedBlockIds.contains(id))
@@ -273,19 +283,19 @@ public class PlayerStatsManager {
         if (sLevel > 0) {
             this.setSkillPoints(this.getSkillPoints() + sLevel);
             this.setSkillLevel(skill, 0);
-            PlayerStatsServerPacket.writeS2CResetSkillPacket((ServerPlayerEntity) playerEntity, skill);
+            PlayerStatsServerPacket.writeS2CResetSkillPacket((EntityPlayerMP) playerEntity, skill);
             return true;
         } else
             return false;
     }
 
-    public static boolean resetSkill(PlayerEntity playerEntity, Skill skill) {
+    public static boolean resetSkill(EntityPlayer playerEntity, Skill skill) {
         PlayerStatsManager playerStatsManager = ((PlayerStatsManagerAccess) playerEntity).getPlayerStatsManager();
         return playerStatsManager.resetSkill(skill);
     }
 
     // Called on server only
-    public static void onLevelUp(PlayerEntity playerEntity, int playerLevel) {
+    public static void onLevelUp(EntityPlayer playerEntity, int playerLevel) {
     }
 
 }

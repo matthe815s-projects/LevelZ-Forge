@@ -5,9 +5,12 @@ import net.levelz.data.LevelLists;
 import net.levelz.network.packets.*;
 import net.levelz.stats.PlayerStatsManager;
 import net.levelz.stats.Skill;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
+
+import java.util.List;
 
 public class PlayerStatsServerPacket {
 
@@ -37,16 +40,16 @@ public class PlayerStatsServerPacket {
         LevelzClient.NETWORK.sendTo(new PacketServerSyncLevel(skill.name(), playerStatsManager.getSkillLevel(skill), playerStatsManager.getSkillPoints()), serverPlayerEntity);
     }
 
-//    public static void writeS2CXPPacket(PlayerStatsManager playerStatsManager, ServerPlayerEntity serverPlayerEntity) {
+    public static void writeS2CXPPacket(PlayerStatsManager playerStatsManager, EntityPlayer serverPlayerEntity) {
 //        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 //        buf.writeFloat(playerStatsManager.getLevelProgress());
 //        buf.writeInt(playerStatsManager.getTotalLevelExperience());
 //        buf.writeInt(playerStatsManager.getOverallLevel());
 //        CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(XP_PACKET, buf);
 //        serverPlayerEntity.networkHandler.sendPacket(packet);
-//    }
+    }
 //
-//    public static void writeS2CSkillPacket(PlayerStatsManager playerStatsManager, ServerPlayerEntity serverPlayerEntity) {
+    public static void writeS2CSkillPacket(PlayerStatsManager playerStatsManager, EntityPlayerMP serverPlayerEntity) {
 //        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 //        buf.writeFloat(playerStatsManager.getLevelProgress());
 //        buf.writeInt(playerStatsManager.getTotalLevelExperience());
@@ -71,7 +74,7 @@ public class PlayerStatsServerPacket {
 //        buf.writeDouble(serverPlayerEntity.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).getBaseValue());
 //        CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(STRENGTH_PACKET, buf);
 //        serverPlayerEntity.networkHandler.sendPacket(packet);
-//    }
+    }
 
     public static void syncLockedBlockList(PlayerStatsManager playerStatsManager) {
         playerStatsManager.lockedBlockIds.clear();
@@ -121,7 +124,7 @@ public class PlayerStatsServerPacket {
         }
     }
 
-//    public static void writeS2CConfigSyncPacket(ServerPlayerEntity serverPlayerEntity, List<Object> list) {
+    public static void writeS2CConfigSyncPacket(EntityPlayer serverPlayerEntity, List<Object> list) {
 //        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 //        for (int i = 0; i < list.size(); i++) {
 //            if (list.get(i) instanceof Integer)
@@ -184,9 +187,9 @@ public class PlayerStatsServerPacket {
 //        }
 //        CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(LIST_PACKET, buf);
 //        serverPlayerEntity.networkHandler.sendPacket(packet);
-//    }
+    }
 //
-//    public static void writeS2CResetSkillPacket(ServerPlayerEntity serverPlayerEntity, Skill skill) {
+    public static void writeS2CResetSkillPacket(EntityPlayer serverPlayerEntity, Skill skill) {
 //        // Sync attributes on server
 //        PlayerStatsManager playerStatsManager = ((PlayerStatsManagerAccess) serverPlayerEntity).getPlayerStatsManager();
 //        int skillLevel = playerStatsManager.getSkillLevel(skill);
@@ -206,9 +209,9 @@ public class PlayerStatsServerPacket {
 //        buf.writeString(skill.name());
 //        CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(RESET_PACKET, buf);
 //        serverPlayerEntity.networkHandler.sendPacket(packet);
-//    }
+    }
 //
-//    public Packet<ClientPlayPacketListener> createS2CLevelExperienceOrbPacket(LevelExperienceOrbEntity levelExperienceOrbEntity) {
+//    public createS2CLevelExperienceOrbPacket(LevelExperienceOrbEntity levelExperienceOrbEntity) {
 //        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 //        buf.writeVarInt(levelExperienceOrbEntity.getId());
 //        buf.writeDouble(levelExperienceOrbEntity.getX());
@@ -216,6 +219,8 @@ public class PlayerStatsServerPacket {
 //        buf.writeDouble(levelExperienceOrbEntity.getZ());
 //        buf.writeShort(levelExperienceOrbEntity.getExperienceAmount());
 //        return ServerPlayNetworking.createS2CPacket(LEVEL_EXPERIENCE_ORB_PACKET, buf);
+
+//        return null;
 //    }
 
 }

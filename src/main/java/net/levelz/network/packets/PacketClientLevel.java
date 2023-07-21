@@ -18,26 +18,26 @@ public class PacketClientLevel implements IMessage, IMessageHandler<PacketClient
 
     @Override
     public IMessage onMessage(PacketClientLevel message, MessageContext ctx) {
-        PacketByteBuf newBuffer = new PacketByteBuf(Unpooled.buffer());
-        newBuffer.writeFloat(buf.readFloat());
-        newBuffer.writeInt(buf.readInt());
-        newBuffer.writeInt(buf.readInt());
-        newBuffer.writeInt(buf.readInt());
-        newBuffer.writeInt(buf.readInt());
-        newBuffer.writeInt(buf.readInt());
-        newBuffer.writeInt(buf.readInt());
-        newBuffer.writeInt(buf.readInt());
-        newBuffer.writeInt(buf.readInt());
-        newBuffer.writeInt(buf.readInt());
-        newBuffer.writeInt(buf.readInt());
-        newBuffer.writeInt(buf.readInt());
-        newBuffer.writeInt(buf.readInt());
-        newBuffer.writeInt(buf.readInt());
-        newBuffer.writeInt(buf.readInt());
-        newBuffer.writeInt(buf.readInt());
-        client.execute(() -> {
-            executeLevelPacket(client.player, newBuffer);
-        });
-        return null
+//        PacketByteBuf newBuffer = new PacketByteBuf(Unpooled.buffer());
+//        newBuffer.writeFloat(buf.readFloat());
+//        newBuffer.writeInt(buf.readInt());
+//        newBuffer.writeInt(buf.readInt());
+//        newBuffer.writeInt(buf.readInt());
+//        newBuffer.writeInt(buf.readInt());
+//        newBuffer.writeInt(buf.readInt());
+//        newBuffer.writeInt(buf.readInt());
+//        newBuffer.writeInt(buf.readInt());
+//        newBuffer.writeInt(buf.readInt());
+//        newBuffer.writeInt(buf.readInt());
+//        newBuffer.writeInt(buf.readInt());
+//        newBuffer.writeInt(buf.readInt());
+//        newBuffer.writeInt(buf.readInt());
+//        newBuffer.writeInt(buf.readInt());
+//        newBuffer.writeInt(buf.readInt());
+//        newBuffer.writeInt(buf.readInt());
+//        client.execute(() -> {
+//            executeLevelPacket(client.player, newBuffer);
+//        });
+        return null;
     }
 }
