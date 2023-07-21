@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.levelz.access.PlayerStatsManagerAccess;
 import net.levelz.init.ConfigInit;
 import net.levelz.init.CriteriaInit;
+import net.levelz.network.PlayerStatsServerPacket;
 import net.levelz.stats.PlayerStatsManager;
 import net.levelz.stats.Skill;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -70,7 +71,7 @@ public class PacketServerStatsIncrease implements IMessage, IMessageHandler<Pack
             //case SMITHING -> syncLockedSmithingItemList(playerStatsManager);
             //syncLockedCraftingItemList(playerStatsManager);
 
-            //writeS2CSyncLevelPacket(playerStatsManager, player, skill);
+            PlayerStatsServerPacket.writeS2CSyncLevelPacket(playerStatsManager, player, skill);
         }
 
         return null;
