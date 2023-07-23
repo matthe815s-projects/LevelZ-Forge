@@ -4,12 +4,13 @@ import net.levelz.config.LevelzConfig;
 import net.levelz.network.PlayerStatsClientPacket;
 import net.levelz.network.PlayerStatsServerPacket;
 import net.minecraft.util.ActionResult;
+import net.minecraftforge.fml.common.Loader;
 
 public class ConfigInit {
 //
-//    public static final boolean isOriginsLoaded = FabricLoader.getInstance().isModLoaded("origins");
+    public static final boolean isOriginsLoaded = Loader.instance().isModLoaded("origins");
 //
-//    public static LevelzConfig CONFIG = new LevelzConfig();
+    public static LevelzConfig CONFIG = new LevelzConfig();
 //
 //    public static void init() {
 //        AutoConfig.register(LevelzConfig.class, JanksonConfigSerializer::new);

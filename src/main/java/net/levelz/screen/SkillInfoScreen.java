@@ -1,22 +1,14 @@
 package net.levelz.screen;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.levelz.init.ConfigInit;
 import net.levelz.init.KeyInit;
 import net.levelz.screen.widget.SkillScrollableWidget;
-import net.libz.api.Tab;
-import net.libz.util.DrawTabHelper;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-@Environment(EnvType.CLIENT)
+@SideOnly(Side.CLIENT)
 public class SkillInfoScreen extends Screen implements Tab {
 
     public static final Identifier BACKGROUND_TEXTURE = new Identifier("levelz:textures/gui/skill_info_background.png");

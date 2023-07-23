@@ -1,19 +1,24 @@
 package net.levelz.screen;
 
+import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.google.common.collect.Multimap;
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.InventoryBasic;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-import org.jetbrains.annotations.Nullable;
-
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.levelz.access.PlayerStatsManagerAccess;
 import net.levelz.data.LevelLists;
 import net.levelz.init.ConfigInit;
@@ -21,41 +26,19 @@ import net.levelz.init.KeyInit;
 import net.levelz.network.PlayerStatsClientPacket;
 import net.levelz.stats.PlayerStatsManager;
 import net.levelz.stats.Skill;
-import net.libz.api.Tab;
-import net.libz.util.DrawTabHelper;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.AxeItem;
-import net.minecraft.item.HoeItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.MiningToolItem;
-import net.minecraft.item.PickaxeItem;
-import net.minecraft.item.ShovelItem;
-import net.minecraft.item.SwordItem;
-import net.minecraft.item.ToolItem;
-import net.minecraft.registry.Registries;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import sun.security.provider.SHA;
 
-@Environment(EnvType.CLIENT)
-public class SkillScreen extends Screen implements Tab {
+@SideOnly(Side.CLIENT)
+public class SkillScreen extends GuiScreen {
 
-    public static final Identifier BACKGROUND_TEXTURE = new Identifier("levelz:textures/gui/skill_background.png");
-    public static final Identifier ICON_TEXTURES = new Identifier("levelz:textures/gui/icons.png");
+    public static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation("levelz:textures/gui/skill_background.png");
+    public static final ResourceLocation ICON_TEXTURES = new ResourceLocation("levelz:textures/gui/icons.png");
 
     private final WidgetButtonPage[] skillButtons = new WidgetButtonPage[12];
     private final WidgetButtonPage[] levelButtons = new WidgetButtonPage[12];
 
-    private PlayerEntity playerEntity;
+    private EntityPlayer playerEntity;
     private PlayerStatsManager playerStatsManager;
 
     private int backgroundWidth = 200;
@@ -64,32 +47,31 @@ public class SkillScreen extends Screen implements Tab {
     private int y;
 
     public SkillScreen() {
-        super(Text.translatable("screen.levelz.skill_screen"));
-
+        super();
     }
 
     @Override
-    protected void init() {
-        super.init();
-        this.playerEntity = this.client.player;
+    public void initGui() {
+        super.initGui();
+        this.playerEntity = Minecraft.getMinecraft().player;
         this.playerStatsManager = ((PlayerStatsManagerAccess) playerEntity).getPlayerStatsManager();
         this.x = (this.width - this.backgroundWidth) / 2;
         this.y = (this.height - this.backgroundHeight) / 2;
 
         for (int i = 0; i < this.skillButtons.length; i++) {
             final int skillInt = i;
-            this.skillButtons[i] = this.addDrawableChild(new WidgetButtonPage(this.x + 15 + (i > 5 ? 90 : 0), this.y + 90 + i * 20 - (i > 5 ? 120 : 0), 16, 16, i * 16, 16, false, true,
-                    Text.translatable("spritetip.levelz." + Skill.values()[i].name().toLowerCase() + "_skill"), button -> {
-                        this.client.setScreen(new SkillInfoScreen(Skill.values()[skillInt].name().toLowerCase()));
+            this.skillButtons[i] = this.addButton(new WidgetButtonPage(this.x + 15 + (i > 5 ? 90 : 0), this.y + 90 + i * 20 - (i > 5 ? 120 : 0), 16, 16, i * 16, 16, false, true,
+                    new TextComponentTranslation("spritetip.levelz." + Skill.values()[i].name().toLowerCase() + "_skill"), button -> {
+                        Minecraft.getMinecraft().displayGuiScreen(new SkillInfoScreen(Skill.values()[skillInt].name().toLowerCase()));
                     }));
             for (int o = 1; o < 10; o++) {
                 String translatable = "spritetip.levelz." + Skill.values()[i].name().toLowerCase() + "_skill_info_" + o;
-                Text tooltip = Text.translatable(translatable);
-                if (!tooltip.getString().equals(translatable)) {
+                TextComponentTranslation tooltip = new TextComponentTranslation(translatable);
+                if (!tooltip.getFormattedText().equals(translatable)) {
                     this.skillButtons[i].addTooltip(tooltip);
                 }
             }
-            this.levelButtons[i] = this.addDrawableChild(new WidgetButtonPage(this.x + 83 + (i > 5 ? 90 : 0), this.y + 92 + i * 20 - (i > 5 ? 120 : 0), 13, 13, 33, 42, true, true, null, button -> {
+            this.levelButtons[i] = this.addButton(new WidgetButtonPage(this.x + 83 + (i > 5 ? 90 : 0), this.y + 92 + i * 20 - (i > 5 ? 120 : 0), 13, 13, 33, 42, true, true, null, button -> {
                 int level = 1;
                 if (((WidgetButtonPage) button).wasRightButtonClicked()) {
                     level = 5;
@@ -98,23 +80,22 @@ public class SkillScreen extends Screen implements Tab {
                 }
                 PlayerStatsClientPacket.writeC2SIncreaseLevelPacket(this.playerStatsManager, Skill.values()[skillInt], level);
             }));
-            this.levelButtons[i].active = playerStatsManager.getSkillPoints() > 0 && this.playerStatsManager.getSkillLevel(Skill.values()[i]) < ConfigInit.CONFIG.maxLevel;
+            //this.levelButtons[i].enabled = playerStatsManager.getSkillPoints() > 0 && this.playerStatsManager.getSkillLevel(Skill.values()[i]) < ConfigInit.CONFIG.maxLevel;
         }
 
-        WidgetButtonPage infoButton = this.addDrawableChild(new WidgetButtonPage(this.x + 178, this.y + 73, 11, 13, 0, 42, true, false, Text.translatable("text.levelz.more_info"), button -> {
-        }));
-        String[] infoTooltip = Text.translatable("text.levelz.gui.level_up_skill.tooltip").getString().split("\n");
+        WidgetButtonPage infoButton = this.addButton(new WidgetButtonPage(this.x + 178, this.y + 73, 11, 13, 0, 42, true, false, new TextComponentTranslation("text.levelz.more_info")));
+        String[] infoTooltip = new TextComponentTranslation("text.levelz.gui.level_up_skill.tooltip").getFormattedText().split("\n");
         for (int i = 0; i < infoTooltip.length; i++) {
-            infoButton.addTooltip(Text.of(infoTooltip[i]));
+            infoButton.addTooltip(new TextComponentTranslation(infoTooltip[i]));
         }
 
         if (!LevelLists.craftingItemList.isEmpty()) {
-            this.addDrawableChild(new WidgetButtonPage(this.x + 180, this.y + 5, 15, 13, 0, 80, true, true, Text.translatable("text.levelz.crafting_info"), button -> {
-                this.client.setScreen(new SkillListScreen("crafting"));
+            this.addButton(new WidgetButtonPage(this.x + 180, this.y + 5, 15, 13, 0, 80, true, true, Text.translatable("text.levelz.crafting_info"), button -> {
+                Minecraft.getMinecraft().displayGuiScreen(new SkillListScreen("crafting"));
             }));
         }
         if (!ConfigInit.CONFIG.useIndependentExp) {
-            WidgetButtonPage levelUpButton = this.addDrawableChild(new WidgetButtonPage(this.x + 177, this.y + 49, 13, 13, 33, 42, true, true, Text.translatable("text.levelz.level_up"), button -> {
+            WidgetButtonPage levelUpButton = this.addButton(new WidgetButtonPage(this.x + 177, this.y + 49, 13, 13, 33, 42, true, true, Text.translatable("text.levelz.level_up"), button -> {
                 int level = 1;
                 if (((WidgetButtonPage) button).wasRightButtonClicked()) {
                     level = 5;
@@ -123,56 +104,50 @@ public class SkillScreen extends Screen implements Tab {
                 }
                 PlayerStatsClientPacket.writeC2SLevelUpPacket(level);
             }));
-            String[] levelUpTooltip = Text.translatable("text.levelz.gui.level_up.tooltip").getString().split("\n");
+            String[] levelUpTooltip = new TextComponentTranslation("text.levelz.gui.level_up.tooltip").getFormattedText().split("\n");
             for (int i = 0; i < levelUpTooltip.length; i++) {
-                levelUpButton.addTooltip(Text.of(levelUpTooltip[i]));
+                levelUpButton.addTooltip(new TextComponentTranslation(levelUpTooltip[i]));
             }
-            levelUpButton.active = !playerStatsManager.isMaxLevel() && (this.playerStatsManager.getNonIndependentExperience() / this.playerStatsManager.getNextLevelExperience()) >= 1;
+            //levelUpButton.active = !playerStatsManager.isMaxLevel() && (this.playerStatsManager.getNonIndependentExperience() / this.playerStatsManager.getNextLevelExperience()) >= 1;
         }
     }
 
     @Override
-    public boolean shouldPause() {
-        return false;
-    }
-
-    @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context);
+    public void drawScreen(int mouseX, int mouseY, float delta) {
+        this.drawBackground(0x000000);
         int i = (this.width - this.backgroundWidth) / 2;
         int j = (this.height - this.backgroundHeight) / 2;
-        context.drawTexture(BACKGROUND_TEXTURE, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
 
-        if (this.client.player != null) {
-            int scaledWidth = this.client.getWindow().getScaledWidth();
-            int scaledHeight = this.client.getWindow().getScaledHeight();
-            InventoryScreen.drawEntity(context, scaledWidth / 2 - 75, scaledHeight / 2 - 40, 30, -28, 0, this.client.player);
+        Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
+
+        if (Minecraft.getMinecraft().player != null) {
+            ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
 
             // Top label
-            Text playerName = Text.translatable("text.levelz.gui.title", playerEntity.getName().getString());
-            context.drawText(this.textRenderer, playerName, this.x - this.textRenderer.getWidth(playerName) / 2 + 120, this.y + 7, 0x3F3F3F, false);
+            TextComponentTranslation playerName = new TextComponentTranslation("text.levelz.gui.title", playerEntity.getName());
+            Minecraft.getMinecraft().fontRenderer.drawString(playerName.getFormattedText(), this.x - this.fontRenderer.getStringWidth(playerName.getFormattedText()) / 2 + 120, this.y + 7, 0x3F3F3F, false);
 
             // Small icon labels
-            context.drawText(this.textRenderer, String.valueOf(Math.round(playerEntity.getHealth())), this.x + 74, this.y + 22, 0x3F3F3F, false); // lifeLabel
-            context.drawText(this.textRenderer, String.valueOf(BigDecimal.valueOf(playerEntity.getAttributeValue(EntityAttributes.GENERIC_ARMOR)).setScale(2, RoundingMode.HALF_DOWN).floatValue()),
+            Minecraft.getMinecraft().fontRenderer.drawString(String.valueOf(Math.round(playerEntity.getHealth())), this.x + 74, this.y + 22, 0x3F3F3F, false); // lifeLabel
+            Minecraft.getMinecraft().fontRenderer.drawString(String.valueOf(BigDecimal.valueOf(playerEntity.getEntityAttribute(SharedMonsterAttributes.ARMOR).getAttributeValue()).setScale(2, RoundingMode.HALF_DOWN).floatValue()),
                     this.x + 74, this.y + 36, 0x3F3F3F, false); // protectionLabel
-            context.drawText(this.textRenderer,
-                    String.valueOf(BigDecimal.valueOf(playerEntity.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED) * 10D).setScale(2, RoundingMode.HALF_DOWN).floatValue()), this.x + 124,
+            Minecraft.getMinecraft().fontRenderer.drawString(
+                    String.valueOf(BigDecimal.valueOf(playerEntity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue() * 10D).setScale(2, RoundingMode.HALF_DOWN).floatValue()), this.x + 124,
                     this.y + 22, 0x3F3F3F, false); // speedLabel
-            context.drawText(this.textRenderer, this.getDamageLabel(), this.x + 124, this.y + 36, 0x3F3F3F, false); // damageLabel
-            context.drawText(this.textRenderer, String.valueOf(Math.round(playerEntity.getHungerManager().getFoodLevel())), this.x + 171, this.y + 22, 0x3F3F3F, false); // foodLabel
-            context.drawText(this.textRenderer, String.valueOf(BigDecimal.valueOf(playerEntity.getAttributeValue(EntityAttributes.GENERIC_LUCK)).setScale(2, RoundingMode.HALF_DOWN).floatValue()),
+            Minecraft.getMinecraft().fontRenderer.drawString(this.getDamageLabel(), this.x + 124, this.y + 36, 0x3F3F3F, false); // damageLabel
+            Minecraft.getMinecraft().fontRenderer.drawString(String.valueOf(Math.round(playerEntity.getFoodStats().getFoodLevel())), this.x + 171, this.y + 22, 0x3F3F3F, false); // foodLabel
+            Minecraft.getMinecraft().fontRenderer.drawString(String.valueOf(BigDecimal.valueOf(playerEntity.getEntityAttribute(SharedMonsterAttributes.LUCK).getAttributeValue()).setScale(2, RoundingMode.HALF_DOWN).floatValue()),
                     this.x + 171, this.y + 36, 0x3F3F3F, false); // fortuneLabel
 
             // Level label
-            Text skillLevelText = Text.translatable("text.levelz.gui.level", playerStatsManager.getOverallLevel());
-            context.drawText(this.textRenderer, skillLevelText, this.x - this.textRenderer.getWidth(skillLevelText) / 2 + 91, this.y + 52, 0x3F3F3F, false);
+            TextComponentTranslation skillLevelText = new TextComponentTranslation("text.levelz.gui.level", playerStatsManager.getOverallLevel());
+            Minecraft.getMinecraft().fontRenderer.drawString(skillLevelText.getFormattedText(), this.x - this.fontRenderer.getStringWidth(skillLevelText.getFormattedText()) / 2 + 91, this.y + 52, 0x3F3F3F, false);
             // Point label
-            Text skillPointText = Text.translatable("text.levelz.gui.points", playerStatsManager.getSkillPoints());
-            context.drawText(this.textRenderer, skillPointText, this.x - this.textRenderer.getWidth(skillPointText) / 2 + 156, this.y + 52, 0x3F3F3F, false);
+            TextComponentTranslation skillPointText = new TextComponentTranslation("text.levelz.gui.points", playerStatsManager.getSkillPoints());
+            Minecraft.getMinecraft().fontRenderer.drawString(skillPointText.getFormattedText(), this.x - this.fontRenderer.getStringWidth(skillPointText.getFormattedText()) / 2 + 156, this.y + 52, 0x3F3F3F, false);
 
             // Experience bar
-            context.drawTexture(ICON_TEXTURES, this.x + 58, this.y + 64, 0, 100, 131, 5);
+            Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(this.x + 58, this.y + 64, 0, 100, 131, 5);
 
             int nextLevelExperience = playerStatsManager.getNextLevelExperience();
             float levelProgress = 0.0f;
@@ -184,10 +159,10 @@ public class SkillScreen extends Screen implements Tab {
                 levelProgress = this.playerStatsManager.getLevelProgress();
                 experience = (int) (nextLevelExperience * levelProgress);
             }
-            context.drawTexture(ICON_TEXTURES, this.x + 58, this.y + 64, 0, 105, (int) (130.0f * levelProgress), 5);
+            Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(this.x + 58, this.y + 64, 0, 105, (int) (130.0f * levelProgress), 5);
             // current xp label
-            Text currentXpText = Text.translatable("text.levelz.gui.current_xp", experience, nextLevelExperience);
-            context.drawText(this.textRenderer, currentXpText, this.x - this.textRenderer.getWidth(currentXpText) / 2 + 123, this.y + 74, 0x3F3F3F, false);
+            TextComponentTranslation currentXpText = new TextComponentTranslation("text.levelz.gui.current_xp", experience, nextLevelExperience);
+            Minecraft.getMinecraft().fontRenderer.drawString(currentXpText.getFormattedText(), this.x - this.fontRenderer.getStringWidth(currentXpText.getFormattedText()) / 2 + 123, this.y + 74, 0x3F3F3F, false);
 
             boolean skillsAllMaxed = true;
             for (int o = 0; o < this.levelButtons.length; o++) {
@@ -198,7 +173,7 @@ public class SkillScreen extends Screen implements Tab {
             }
             if (skillsAllMaxed && ConfigInit.CONFIG.allowHigherSkillLevel) {
                 for (int o = 0; o < this.levelButtons.length; o++) {
-                    this.levelButtons[o].active = true;
+                    //this.levelButtons[o].active = true;
                 }
             }
 
