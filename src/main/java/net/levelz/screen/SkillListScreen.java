@@ -1,24 +1,21 @@
 package net.levelz.screen;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.levelz.data.LevelLists;
 import net.levelz.init.ConfigInit;
 import net.levelz.init.KeyInit;
 import net.levelz.screen.widget.SkillListScrollableWidget;
-import net.libz.api.Tab;
-import net.libz.util.DrawTabHelper;
-import net.libz.util.SortList;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-@Environment(EnvType.CLIENT)
-public class SkillListScreen extends Screen implements Tab {
+@SideOnly(Side.CLIENT)
+public class SkillListScreen extends GuiScreen {
 
     private int backgroundWidth = 200;
     private int backgroundHeight = 215;
@@ -29,24 +26,24 @@ public class SkillListScreen extends Screen implements Tab {
     private final boolean crafing;
 
     public SkillListScreen(String title) {
-        super(Text.of(title));
+        super();
         this.title = title;
         this.crafing = this.title.equals("crafting");
     }
 
     @Override
-    protected void init() {
-        super.init();
+    public void initGui() {
+        super.initGui();
 
         this.x = (this.width - this.backgroundWidth) / 2;
         this.y = (this.height - this.backgroundHeight) / 2;
 
-        this.addDrawableChild(new SkillScreen.WidgetButtonPage(this.x + 180, this.y + (this.crafing ? 5 : 7), 15 - (this.crafing ? 0 : 3), 13 - (this.crafing ? 0 : 4), this.crafing ? 0 : 57, 80,
+        this.addButton(new SkillScreen.WidgetButtonPage(this.x + 180, this.y + (this.crafing ? 5 : 7), 15 - (this.crafing ? 0 : 3), 13 - (this.crafing ? 0 : 4), this.crafing ? 0 : 57, 80,
                 this.crafing, true, null, button -> {
                     if (this.crafing) {
-                        this.client.setScreen(new SkillScreen());
+                        this.mc.displayGuiScreen(new SkillScreen());
                     } else {
-                        this.client.setScreen(new SkillInfoScreen(this.title));
+                        this.mc.displayGuiScreen(new SkillInfoScreen(this.title));
                     }
                 }));
 
@@ -67,53 +64,35 @@ public class SkillListScreen extends Screen implements Tab {
             objectList = LevelLists.craftingItemList;
             skillList = LevelLists.craftingSkillList;
             if (ConfigInit.CONFIG.sortCraftingRecipesBySkill) {
-                SortList.concurrentSort(skillList, skillList, levelList, objectList);
+                //SortList.concurrentSort(skillList, skillList, levelList, objectList);
             }
         }
 
-        this.addDrawableChild(new SkillListScrollableWidget(this.x + 10, this.y + 22, 183, 185, levelList, objectList, skillList, this.title, this.textRenderer));
+        this.addButton(new SkillListScrollableWidget(this.x + 10, this.y + 22, 183, 185, levelList, objectList, skillList, this.title, this.fontRenderer));
     }
 
     @Override
-    public boolean shouldPause() {
+    public boolean doesGuiPauseGame() {
         return false;
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context);
+    public void drawScreen(int mouseX, int mouseY, float delta) {
+        this.drawBackground(0x000000);
 
         int i = (this.width - this.backgroundWidth) / 2;
         int j = (this.height - this.backgroundHeight) / 2;
-        context.drawTexture(SkillInfoScreen.BACKGROUND_TEXTURE, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight, 256, 256);
-        context.drawText(this.textRenderer, Text.translatable("text.levelz.locked_list", Text.translatable(String.format("spritetip.levelz.%s_skill", this.title))), this.x + 6, this.y + 7, 0x3F3F3F,
-                false);
-        DrawTabHelper.drawTab(client, context, this, x, y, mouseX, mouseY);
+        this.mc.ingameGUI.drawTexturedModalRect(i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        this.mc.ingameGUI.drawString(this.fontRenderer, new TextComponentTranslation("text.levelz.locked_list", new TextComponentTranslation(String.format("spritetip.levelz.%s_skill", this.title))).getFormattedText(), this.x + 6, this.y + 7, 0x3F3F3F);
+        //DrawTabHelper.drawTab(client, context, this, x, y, mouseX, mouseY);
 
-        super.render(context, mouseX, mouseY, delta);
+        super.drawScreen(mouseX, mouseY, delta);
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (this.client.options.inventoryKey.matchesKey(keyCode, scanCode)) {
-            if (ConfigInit.CONFIG.switch_screen) {
-                this.client.setScreen(new SkillScreen());
-            } else {
-                this.close();
-            }
-            return true;
-
-        } else if (KeyInit.screenKey.matchesKey(keyCode, scanCode)) {
-            this.client.setScreen(new SkillScreen());
-            return true;
-        }
-        return super.keyPressed(keyCode, scanCode, modifiers);
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        DrawTabHelper.onTabButtonClick(client, this, this.x, this.y, mouseX, mouseY, false);
-        return super.mouseClicked(mouseX, mouseY, button);
+    public void handleMouseInput() throws IOException {
+        //DrawTabHelper.onTabButtonClick(client, this, this.x, this.y, mouseX, mouseY, false);
+        super.handleMouseInput();
     }
 
     public int getWidth() {
