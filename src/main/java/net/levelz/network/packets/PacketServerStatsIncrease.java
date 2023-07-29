@@ -42,7 +42,7 @@ public class PacketServerStatsIncrease implements IMessage, IMessageHandler<Pack
             }
 
             for (int i = 1; i <= level; i++) {
-                CriteriaInit.SKILL_UP.trigger(player, skillString.toLowerCase(), playerStatsManager.getSkillLevel(skill) + level);
+                //CriteriaInit.SKILL_UP.trigger(player, skillString.toLowerCase(), playerStatsManager.getSkillLevel(skill) + level);
             }
 
             playerStatsManager.setSkillLevel(skill, playerStatsManager.getSkillLevel(skill) + level);

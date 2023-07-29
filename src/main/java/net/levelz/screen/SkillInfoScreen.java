@@ -10,6 +10,7 @@ import net.levelz.init.KeyInit;
 import net.levelz.screen.widget.SkillScrollableWidget;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -160,7 +161,7 @@ public class SkillInfoScreen extends GuiScreen {
             break;
         }
 
-        List<TextComponentTranslation> list = new ArrayList<>();
+        List<ITextComponent> list = new ArrayList<>();
         list.add(translatableText1A);
         list.add(translatableText1B);
         list.add(translatableText2A);
@@ -170,7 +171,7 @@ public class SkillInfoScreen extends GuiScreen {
         list.add(translatableText6A);
         list.add(translatableText6B);
 
-        this.addButton(new SkillScrollableWidget(this.x + 10, this.y + 22, 183, 185, list, this.title, this.fontRenderer));
+        //this.addButton(new SkillScrollableWidget(this.x + 10, this.y + 22, 183, 185, list, this.title, this.fontRenderer));
     }
 
     @Override

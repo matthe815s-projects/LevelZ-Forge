@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
 @Mod(modid = LevelzClient.MODID)
 public class LevelzClient {
-    public static final String MODID = "LEVEL-Z";
+    public static final String MODID = "level-z";
 
     public static final SimpleNetworkWrapper NETWORK = new SimpleNetworkWrapper(MODID);
 

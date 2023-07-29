@@ -1,0 +1,14 @@
+modLoader="javafml"
+loaderVersion="[28,)"
+issueTrackerURL="https://github.com/matthe815/mmo-parties"
+license="mit"
+
+[[mods]]
+modId="levelz"
+version="1.0"
+displayName="Level-Z Forge"
+#updateJSONURL=""
+displayURL="https://github.com/matthe815/mmo-parties"
+#logoFile="logo.png"
+authors="Matthe815"
+description="An MMO esque leveling system for Forge"

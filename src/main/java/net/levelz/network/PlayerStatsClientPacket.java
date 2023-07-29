@@ -5,10 +5,8 @@ import java.util.List;
 import java.util.Objects;
 
 import net.levelz.LevelzClient;
-import net.levelz.access.PlayerStatsManagerAccess;
 import net.levelz.data.LevelLists;
 import net.levelz.data.LevelLoader;
-import net.levelz.entity.LevelExperienceOrbEntity;
 import net.levelz.init.ConfigInit;
 import net.levelz.network.packets.*;
 import net.levelz.stats.PlayerStatsManager;

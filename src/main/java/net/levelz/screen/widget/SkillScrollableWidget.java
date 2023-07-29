@@ -3,17 +3,14 @@ package net.levelz.screen.widget;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.animation.TranslateTransition;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.resources.Language;
-import net.minecraft.client.resources.LanguageManager;
-import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.client.GuiScrollingList;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -21,10 +18,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.codec.language.bm.Languages;
 import org.apache.commons.codec.language.bm.NameType;
-import org.apache.commons.lang3.StringUtils;
 import net.levelz.data.LevelLists;
 import net.levelz.init.ConfigInit;
-import net.levelz.screen.SkillInfoScreen;
 import net.minecraft.util.math.MathHelper;
 
 import javax.annotation.Nullable;
@@ -32,7 +27,7 @@ import javax.annotation.Nullable;
 @SideOnly(Side.CLIENT)
 public class SkillScrollableWidget extends GuiScrollingList {
 
-    private final List<TextComponentTranslation> textList;
+    private final List<ITextComponent> textList;
     private final String title;
     private final FontRenderer textRenderer;
 
@@ -43,7 +38,7 @@ public class SkillScrollableWidget extends GuiScrollingList {
 
     private boolean scrollbarDragged;
 
-    public SkillScrollableWidget(int x, int y, int width, int height, List<TextComponentTranslation> textList, String title, FontRenderer textRenderer) {
+    public SkillScrollableWidget(int x, int y, int width, int height, List<ITextComponent> textList, String title, FontRenderer textRenderer) {
         super(Minecraft.getMinecraft(), x, y, width, height, 0, 0);
         this.title = title;
         this.textRenderer = textRenderer;
@@ -214,7 +209,7 @@ public class SkillScrollableWidget extends GuiScrollingList {
         return MathHelper.clamp((int) ((float) (this.listHeight * this.listHeight) / (float) this.getContentsHeightWithPadding()), 32, this.listHeight);
     }
 
-    private boolean translatableTextIsNotBlank(@Nullable TextComponentTranslation text) {
+    private boolean translatableTextIsNotBlank(@Nullable ITextComponent text) {
         if (text == null) {
             return false;
         }

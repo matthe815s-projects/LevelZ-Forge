@@ -9,8 +9,6 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import scala.Byte;
-import sun.security.provider.SHA;
 
 public class PacketClientReset implements IMessage, IMessageHandler<PacketClientReset, IMessage> {
     String skillString = "";

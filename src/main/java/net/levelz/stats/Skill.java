@@ -1,9 +1,8 @@
 package net.levelz.stats;
 
-import net.minecraft.util.math.random.Random;
-
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public enum Skill {
@@ -34,7 +33,7 @@ public enum Skill {
 
     public static Iterable<Skill> listInRandomOrder(Random random) {
         if (random == null) {
-            random = Random.create();
+            random = new Random();
         }
         Random finalRandom = random;
         return Arrays.stream(Skill.values()).sorted(Comparator.comparing(it -> finalRandom.nextInt())).collect(Collectors.toList());

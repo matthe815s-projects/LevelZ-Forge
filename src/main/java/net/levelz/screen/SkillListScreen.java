@@ -68,7 +68,7 @@ public class SkillListScreen extends GuiScreen {
             }
         }
 
-        this.addButton(new SkillListScrollableWidget(this.x + 10, this.y + 22, 183, 185, levelList, objectList, skillList, this.title, this.fontRenderer));
+        //this.addButton(new SkillListScrollableWidget(this.x + 10, this.y + 22, 183, 185, levelList, objectList, skillList, this.title, this.fontRenderer));
     }
 
     @Override
